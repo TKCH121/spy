@@ -1,0 +1,114 @@
+<title>SPY Signal Plan</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,600&display=swap">
+<style>
+/* Layout: one readable column, a decision table, and a short checklist. */
+:root {
+  --bg: #f7f8f9; --surface: #ffffff; --fg: #15191e; --muted: #59616b;
+  --line: #dde1e6; --accent: #2a62b8; --buy: #2a78d6; --sell: #d8413f; --hold: #8c8f93;
+  --display: "Fraunces", Georgia, serif;
+  --body: "IBM Plex Sans", -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121519; --surface: #1a1e23; --fg: #e9ecef; --muted: #a2aab3;
+  --line: #2d333a; --accent: #6ea0ec; --buy: #4a92ec; --sell: #ec6563; --hold: #9a9da1; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #121519; --surface: #1a1e23; --fg: #e9ecef; --muted: #a2aab3;
+  --line: #2d333a; --accent: #6ea0ec; --buy: #4a92ec; --sell: #ec6563; --hold: #9a9da1; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font: 15px/1.6 var(--body); padding: 0 16px; }
+main { max-width: 760px; margin: 0 auto; padding-block: 48px 64px; display: grid; gap: 36px; }
+h1 { font: 600 2.1rem/1.15 var(--display); margin: 0; text-wrap: balance; }
+h2 { font: 600 1.2rem/1.3 var(--body); margin: 0 0 12px; text-wrap: balance; }
+p { margin: 0; max-width: 66ch; }
+.eyebrow { font: 500 0.75rem/1 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+.lede { font-size: 1.05rem; color: var(--fg); margin-top: 14px; }
+.pipeline { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font: 0.85rem/1.3 var(--mono); }
+.pipeline span { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; }
+.pipeline i { color: var(--muted); font-style: normal; }
+.classes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.chip { font: 500 0.8rem/1 var(--mono); padding: 6px 10px; border-radius: 99px; border: 1.5px solid; }
+.chip.buy { color: var(--buy); } .chip.hold { color: var(--hold); } .chip.sell { color: var(--sell); }
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 560px; }
+th, td { text-align: left; vertical-align: top; padding: 12px 14px; border-top: 1px solid var(--line); }
+thead th { border-top: 0; font: 500 0.75rem/1 var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+td:first-child { font-weight: 600; width: 34%; }
+td:last-child { color: var(--muted); }
+code { font: 0.86em var(--mono); }
+ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.status li::marker { content: none; }
+.status { list-style: none; padding: 0; }
+.status li { display: flex; gap: 10px; }
+.box { font: 500 0.8rem/1.6 var(--mono); color: var(--muted); flex: none; }
+.box.done { color: var(--accent); }
+.stat { font-variant-numeric: tabular-nums; }
+footer { color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--line); padding-top: 16px; }
+</style>
+
+<main>
+  <header>
+    <div class="eyebrow">ML project · SPY Buy / Sell / Hold</div>
+    <h1>What we're building and why</h1>
+    <p class="lede">The grade is for method, not profit. We need no look-ahead, honest validation, and a clear explanation of why the model probably loses to Buy &amp; Hold after fees. Every choice below exists to make that story clean and defensible.</p>
+  </header>
+
+  <section>
+    <h2>The plan</h2>
+    <p>Each day at the close, we predict what SPY does over the next 5 trading days using about 15 features from price, volatility, VIX and volume. We trade at the next morning's open, pay 0.1% per trade, and compare against simply holding SPY.</p>
+    <div class="classes">
+      <span class="chip buy">Buy · big up move</span>
+      <span class="chip hold">Hold · in between</span>
+      <span class="chip sell">Sell · big down move</span>
+    </div>
+    <div class="pipeline" style="margin-top:16px">
+      <span>features at close t</span><i>→</i><span>predict</span><i>→</i><span>trade at open t+1</span><i>→</i><span>hold 5 days</span>
+    </div>
+  </section>
+
+  <section>
+    <h2>Key decisions</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Decision</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>Trade at the next open, not the same close</td><td>You can't trade at the close you used to compute the signal. That is quiet look-ahead. The label measures the return we could actually capture.</td></tr>
+          <tr><td>Thresholds scale with volatility, not a fixed ±1%</td><td>With ±1%, calm years are nearly all Hold and crisis years almost never are, so the model could "predict" Hold from volatility alone without any sense of direction. Scaled, Buy means "a big move for current conditions". About a third of labels are Hold.</td></tr>
+          <tr><td>Train 2006–2020, validate 2021–22, test 2023+, with a 6-day gap at each boundary</td><td>Random splits leak the future. A 5-day label at the end of training uses prices from the validation period, so we drop those days.</td></tr>
+          <tr><td>The test set is used once, at the end</td><td>Every look at it that changes a decision turns it into more training data.</td></tr>
+          <tr><td>Features built the way systematic funds build them</td><td>MACD and Bollinger Bands are fixed-parameter versions of trend and mean-reversion ideas. We use volatility-scaled versions, plus VIX and the gap between VIX and realized volatility. They still count as the required technical indicators.</td></tr>
+          <tr><td>No VWAP feature</td><td>Daily data has no real VWAP. Our approximation moves almost exactly with price ÷ 20-day average (correlation <span class="stat">0.99</span>), so it adds nothing.</td></tr>
+          <tr><td>Class weights, not SMOTE</td><td>Buy outnumbers Sell because markets drift up. SMOTE invents days by blending real ones from different times, which doesn't make sense for time series.</td></tr>
+          <tr><td>Dummy → Logistic → Random Forest → XGBoost</td><td>The assignment asks for interpretable models. The Dummy baseline shows what "no skill" scores.</td></tr>
+          <tr><td>Hold means "keep the current position"</td><td>Otherwise the model jumps in and out and fees eat the returns.</td></tr>
+          <tr><td>Judge by macro F1 and balanced accuracy</td><td>Plain accuracy rewards always guessing the biggest class. About 0.35–0.40 is normal. Much higher means a leak.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>How we prove there's no leakage</h2>
+    <ul>
+      <li>Features for a day are identical whether or not later data exists.</li>
+      <li>Changing prices after a label's window doesn't change the label.</li>
+      <li>No training label overlaps validation or test.</li>
+      <li>A signal at close t trades at the next open, and every trade pays the fee.</li>
+      <li>Training on shuffled labels drops the score to chance.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Where we are</h2>
+    <ul class="status">
+      <li><span class="box done">[x]</span><span>Data, features, labels, splits and backtest code, with 11 leakage tests passing</span></li>
+      <li><span class="box done">[x]</span><span>EDA notebook runs (development period only)</span></li>
+      <li><span class="box done">[x]</span><span>First cross-validation: models reach <span class="stat">≈0.39</span> balanced accuracy vs <span class="stat">0.33</span> for the Dummy. Shuffled labels give <span class="stat">0.32</span>, so the pipeline isn't leaking</span></li>
+      <li><span class="box">[ ]</span><span>Tune hyperparameters with small grids, on training data only</span></li>
+      <li><span class="box">[ ]</span><span>Validation check, split into "Hold vs move" and "Buy vs Sell"</span></li>
+      <li><span class="box">[ ]</span><span>Final test and vectorbt backtest vs Buy &amp; Hold, run once</span></li>
+      <li><span class="box">[ ]</span><span>Lessons learned</span></li>
+    </ul>
+  </section>
+
+  <footer>Code: <code>spysignal/</code> (settings in <code>config.py</code>), notebooks <code>01_eda</code> and <code>02_modeling</code>, tests in <code>tests/test_leakage.py</code>. Full detail in the project README.</footer>
+</main>
