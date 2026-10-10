@@ -38,11 +38,13 @@ holding SPY.
 
 - [x] Data, features, labels, splits, backtest code + leakage tests (11 passing)
 - [x] `01_eda.ipynb` — runs end to end (dev period only)
-- [x] `02_modeling.ipynb` — walk-forward CV baseline runs. First result: models about 0.39 balanced accuracy vs 0.33 for Dummy; shuffled labels give 0.32
-- [ ] Hyperparameter tuning (small grids, training CV only)
-- [ ] Validation check, incl. splitting the result into "Hold vs move" and "Buy vs Sell"
-- [ ] Final test + vectorbt backtest vs Buy & Hold (once)
-- [ ] Lessons learned
+- [x] `02_modeling.ipynb` — the whole pipeline runs end to end (untuned models):
+  - CV: random forest macro F1 0.37 vs Dummy 0.20; shuffled labels give chance (0.32).
+  - Validation 2021–22: macro F1 0.41. The skill is Hold vs move (0.61); Buy vs Sell shows no skill (54% vs 56.5% for always-Buy).
+  - Validation backtest +20% vs Buy & Hold +5%, but only because the model sat in cash through most of 2022. In all 5 training folds it lost to Buy & Hold.
+- [x] Lessons learned — draft in section 8; update after tuning and the final test
+- [ ] **Hyperparameter tuning** (section 3, small grids, training CV only)
+- [ ] **Final test** (section 7): set `RUN_FINAL_TEST = True` **once**, after tuning is frozen. Don't tune after looking at it.
 
 ## Layout & setup
 
