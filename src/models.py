@@ -88,11 +88,13 @@ SEARCH_SPACES = {
 }
 
 
-def tune(name: str, X: pd.DataFrame, y: pd.Series, cv, n_iter: int = 25, **pipe_kwargs):
-    """RandomizedSearchCV over the whole Pipeline with time-series CV, scored by macro-F1."""
+def tune(name: str, X: pd.DataFrame, y: pd.Series, cv, n_iter: int = 25,
+         scoring: str = "f1_macro", **pipe_kwargs):
+    """RandomizedSearchCV over the whole Pipeline with time-series CV, scored by macro-F1
+    (v1) or, for v2, by `scoring="neg_log_loss"` (docs/v2_design_note.md, C5)."""
     search = RandomizedSearchCV(
         make_pipeline(name, **pipe_kwargs), SEARCH_SPACES[name], n_iter=n_iter,
-        scoring="f1_macro", cv=cv, random_state=config.SEED, n_jobs=-1, refit=True,
+        scoring=scoring, cv=cv, random_state=config.SEED, n_jobs=-1, refit=True,
         return_train_score=True,
     )
     search.fit(X, y)

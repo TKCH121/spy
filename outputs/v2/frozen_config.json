@@ -1,0 +1,19 @@
+{
+  "model": "HGB",
+  "default": "long",
+  "params": {
+    "clf__l2_regularization": 0.17336465350777208,
+    "clf__learning_rate": 0.032268708256236636,
+    "clf__max_depth": 3,
+    "clf__max_iter": 51,
+    "clf__min_samples_leaf": 153
+  },
+  "label": "\u00b11% open(t+1)\u2192open(t+6)",
+  "gap": 6,
+  "hurdle": 0.003,
+  "mu_note": "class means re-estimated on the training rows of every fit",
+  "val_sharpe_excess": 0.178,
+  "val_final_value": 105195.08,
+  "val_bh_sharpe_excess": 0.166,
+  "frozen_before_test": true
+}
