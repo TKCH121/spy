@@ -4,7 +4,7 @@ Module 3 Group 7 · 2026-10-22. Detailed reports: [v1](report.md) · [v2](v2/rep
 
 ## The question and the answer
 
-Can a classifier that predicts SPY's next-5-day move as Buy (> +1%), Sell (< −1%) or Hold decide when to be in the market better than buying and holding?
+Can a classifier that predicts the best action for SPY over the next 5 trading days, Buy (> +1%), Sell (< −1%) or Hold, beat buying and holding when we trade on its predictions? Every version acts on a fresh prediction each day. A weekly schedule (one decision each Friday, as the brief literally reads) is checked at the end.
 
 **No.** Three versions, each tested without look-ahead and with realistic costs, all failed to time the market. The model is a genuine, if weak, classifier, but its skill is in the **size** of next week's move, not the **direction**.
 
@@ -43,6 +43,20 @@ Can a classifier that predicts SPY's next-5-day move as Buy (> +1%), Sell (< −
 - **Trading:** the pre-set selection rule picked a version that **never sold**: not in 2013–2022, not in 2023–24, not on the 2025–26 holdout ($134,410, identical to Buy & Hold). Every version that did trade lost money relative to holding.
 - **Accuracy vs macro-F1:** v3's accuracy is the highest of any version (48–50%), but its macro-F1 is the lowest (0.35–0.37). Calibrated odds call the common Hold weeks more often. Accuracy alone would have told the wrong story.
 
+## One decision a week instead of every day ([report](weekly/report.md))
+
+The brief's literal reading: after Friday's close, predict Buy / Hold / Sell for the next 5 trading days, trade at Monday's open, and hold all week. We re-ran every version on that schedule with the same frozen models. This was decided after the test results were known, so it is a sensitivity check, not a selection.
+
+| $100,000, 2023–24 | Daily | Weekly | Buy & Hold |
+|---|---|---|---|
+| v1 | $123,714 (15 round trips) | $124,654 (6) | $156,546 |
+| v2 | $121,812 (17) | $123,834 (9) | $156,546 |
+| v3 | $156,546 (never trades) | $156,546 (never trades) | $156,546 |
+
+- **Weekly halves the trades and costs, but the gap to Buy & Hold stays about $32,000.**
+- **Timing against random traders gets slightly worse on the weekly schedule.** Over 2013–24, weekly v2 made $167,581 vs $179,977 daily.
+- **The weakness is what the model predicts, not how often it acts.**
+
 ## Why predicting markets is hard (what this project showed)
 
 1. **Size is predictable; direction isn't.** Big-move weeks cluster (volatility clustering), so the model can see them coming. Which way they go is close to a coin flip.
@@ -53,7 +67,7 @@ Can a classifier that predicts SPY's next-5-day move as Buy (> +1%), Sell (< −
 
 ## How we know these results are honest
 
-- **No look-ahead:** 46 automated tests, run in CI. For example, cutting or shocking future data must not change any feature or prediction.
+- **No look-ahead:** 50 automated tests, run in CI. For example, cutting or shocking future data must not change any feature or prediction.
 - **Time-ordered splits** with label-length gaps, and tuning with `TimeSeriesSplit` using the same gap.
 - **Selection rules written before results;** each test period opened once, after freezing; every later change logged with its date.
 - **More than one number:** bootstrap confidence intervals, a random-timing benchmark with matched exposure, and a 12-year walk-forward.

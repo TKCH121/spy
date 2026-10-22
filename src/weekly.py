@@ -36,8 +36,12 @@ def weekly_positions_from_actions(actions: pd.Series, start: int = 0) -> pd.Seri
     return _hold_between_decisions(pd.Series(out, index=days), actions.index, start)
 
 
-def weekly_positions_from_er(er: pd.Series, default: str, hurdle: float = v2.ROUND_TRIP) -> pd.Series:
+def weekly_positions_from_er(
+    er: pd.Series, default: str, hurdle: float = v2.ROUND_TRIP
+) -> pd.Series:
     """v2/v3 expected-return rule, applied to week-end values only."""
     days = week_end_days(er.index)
     start = 1 if default == "long" else 0
-    return _hold_between_decisions(v2.positions_from_er(er.loc[days], default, hurdle), er.index, start)
+    return _hold_between_decisions(
+        v2.positions_from_er(er.loc[days], default, hurdle), er.index, start
+    )

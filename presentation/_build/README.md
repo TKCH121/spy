@@ -11,7 +11,7 @@
 ## Inputs
 
 - `v1_money_paths.json` (this folder)
-- `outputs/v2/results.json`, from `notebooks/v2_02_modeling.ipynb`. It only exists once PR #2 is merged.
+- `outputs/v2/results.json` (from `notebooks/v2_02_modeling.ipynb`) and `outputs/weekly/results.json` (from `notebooks/weekly_decisions.ipynb`).
 - v3's numbers are typed into the script from `outputs/v3/calibration_report.md` and `development_report.md` (PRs #4, #5).
 
 ## Commands
@@ -25,7 +25,7 @@ python presentation/_build/money_paths.py . presentation/_build/v1_money_paths.j
 ```
 
 ```bash
-node presentation/_build/build_presentation.js presentation/SPY_Model_Presentation.pptx presentation/_build/v1_money_paths.json outputs/v2/results.json presentation/Presentation_Script.md
+node presentation/_build/build_presentation.js presentation/SPY_Model_Presentation.pptx presentation/_build/v1_money_paths.json outputs/v2/results.json presentation/Presentation_Script.md outputs/weekly/results.json
 ```
 
 The internal change note (`presentation/INTERNAL_*`) is kept out of git by `.gitignore`.

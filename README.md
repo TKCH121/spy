@@ -1,6 +1,6 @@
 # Can a computer beat “buy and wait”? — SPY trading signal model (Module 3, Group 7)
 
-A machine-learning model predicts whether SPY (the S&P 500 fund) will rise more than 1%, fall more than 1% or stay flat over the next 5 trading days. It trades on those predictions, and the result is compared with simply buying and holding. The project is graded on **methodology, code quality and interpretation**, not profit. Everything below is built to be leakage-free and honestly tested.
+A machine-learning model predicts the best action for SPY (the S&P 500 fund) over the next 5 trading days: **Buy** (expected rise > 1%), **Sell** (fall > 1%) or **Hold**. A backtest trades on those predictions, and the result is compared with simply buying and holding. Every version acts on a fresh prediction each day. A weekly schedule (one decision each Friday, the brief's literal reading) is tested as well. The project is graded on **methodology, code quality and interpretation**, not profit. Everything below is built to be leakage-free and honestly tested.
 
 ## The answer in three lines
 
@@ -19,6 +19,8 @@ A machine-learning model predicts whether SPY (the S&P 500 fund) will rise more 
 
 v2 and v3 predict an execution-aligned label (open → open), so their scores are not exactly comparable with v1's. v3's accuracy is higher, but only because calibrated odds call the common "flat" weeks more often. Its macro-F1 is the lowest.
 
+**One decision a week** ([report](outputs/weekly/report.md)): after Friday's close, predict for the next 5 days, trade at Monday's open, and hold all week. This uses the same frozen models and roughly halves trading costs: on 2023–24, v1 makes $124,654 and v2 $123,834. The conclusion doesn't change. It is a sensitivity check, decided after the test results were known.
+
 ## For assessors: where each deliverable is
 
 | The brief asks for | Open | Look at |
@@ -27,9 +29,10 @@ v2 and v3 predict an execution-aligned label (open → open), so their scores ar
 | **Modelling notebook** (pipeline, features, training, tuning) | [notebooks/02_modeling.ipynb](notebooks/02_modeling.ipynb) | Time-ordered splits with gaps (§1), baselines (§3), tuned candidates in sklearn Pipelines (§4), selection rules (§7–8), one-time test (§9). The feature formulas are in [src/features.py](src/features.py). |
 | **Realistic backtest** with fees, vs Buy & Hold | [notebooks/03_backtest.ipynb](notebooks/03_backtest.ipynb) | vectorbt, 0.10% fee + 0.05% slippage per side, fills at the next open, equity vs Buy & Hold (§1), fee sensitivity (§2) |
 | **Lessons learned** | [outputs/report.md](outputs/report.md) (v1) · [outputs/SUMMARY.md](outputs/SUMMARY.md) (all versions) | Where the model failed, why it lost, why markets are hard |
-| **No look-ahead bias** | [tests/](tests/) (46 tests, run in CI) | Features unchanged when future data is cut or shocked; labels and splits never cross boundaries; no fit reads labels after its window |
+| **No look-ahead bias** | [tests/](tests/) (50 tests, run in CI) | Features unchanged when future data is cut or shocked; labels and splits never cross boundaries; no fit reads labels after its window |
 | **Class imbalance** | `02_modeling` §4 (E04–E08), [outputs/v3/calibration_report.md](outputs/v3/calibration_report.md) | Class weights vs SMOTE vs none, and what weighting does to the odds |
 | Beyond the brief | `v2_02_modeling`, `v3_01…03`, [docs/](docs/) | Two improved versions, each designed (and, for v3, fingerprinted) before any code was written |
+| Weekly decisions (the brief's literal "next 5 days") | [notebooks/weekly_decisions.ipynb](notebooks/weekly_decisions.ipynb) | Every version re-run with one Buy/Hold/Sell decision per week |
 
 **Suggested reading order (about 20 minutes):** this page → [outputs/SUMMARY.md](outputs/SUMMARY.md) → notebooks `01` → `02` → `03` → the v2 and v3 reports. The slides are in [presentation/](presentation/).
 
@@ -57,6 +60,7 @@ notebooks/
   v3_01_calibration.ipynb          v3 · do the corrected odds match reality? (no trading)
   v3_02_development_and_freeze.ipynb  v3 · 2013–2022 selection and freeze
   v3_03_test_and_holdout.ipynb     v3 · 2023–24 and the 2025–26 holdout
+  weekly_decisions.ipynb           all versions · one decision per week (sensitivity check)
 src/
   config.py      every design constant (dates, thresholds, costs, gaps)
   data.py        download / load the price snapshot
@@ -70,8 +74,9 @@ src/
   research.py    v1 follow-up research: walk-forward refits, weight strategies
   v2.py          expected-return rule, T-bill cash simulator, random timing, bootstrap
   v3.py          probability calibration treatments and their walk-forward
-tests/           look-ahead, label, split, v2 strategy and v3 calibration tests (pytest)
-outputs/         v1 results and report · research/ · v2/ · v3/
+  weekly.py      one-decision-a-week schedule (Friday close → Monday open)
+tests/           look-ahead, label, split, v2 strategy, v3 calibration and weekly tests (pytest)
+outputs/         v1 results and report · research/ · v2/ · v3/ · weekly/
 data/            raw/ price and T-bill snapshots · holdout/ 2025–26 data
 presentation/    slide deck, 10-minute script, build files
 knowledge&docs/  course materials and project brief (read-only)
@@ -98,7 +103,7 @@ conda run -n spy-m3 python -m pytest -q
 ```
 
 ```bash
-cd notebooks && for n in 01_eda 02_modeling 03_backtest 04_strategy_research 05_holdout_2025 v2_02_modeling v3_01_calibration v3_02_development_and_freeze v3_03_test_and_holdout; do conda run -n spy-m3 jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.kernel_name=spy-m3 $n.ipynb; done
+cd notebooks && for n in 01_eda 02_modeling 03_backtest 04_strategy_research 05_holdout_2025 v2_02_modeling v3_01_calibration v3_02_development_and_freeze v3_03_test_and_holdout weekly_decisions; do conda run -n spy-m3 jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.kernel_name=spy-m3 $n.ipynb; done
 ```
 
 Code style is checked with `ruff check src tests` and `ruff format --check src tests` (config in `ruff.toml`). On some Windows setups, pytest needs `--basetemp` pointing to a writable folder.

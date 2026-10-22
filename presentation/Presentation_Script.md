@@ -1,6 +1,6 @@
 # Presentation script — Can a computer beat “buy and wait”?
 
-Module 3 Group 7 · goes with `SPY_Model_Presentation.pptx` (29 slides) · **about 10 minutes of speaking**, plus clicks and questions.
+Module 3 Group 7 · goes with `SPY_Model_Presentation.pptx` (30 slides) · **about 10 minutes of speaking**, plus clicks and questions.
 
 **Speak** slides carry the deliverables the brief grades. **Flash** slides get one line. **Skip** slides are there as backup for questions: click past them. Say it in your own words. Fill in the presenter names and date on slide 1.
 
@@ -14,7 +14,7 @@ Module 3 Group 7 · goes with `SPY_Model_Presentation.pptx` (29 slides) · **abo
 | 6 | The two-year journey of $100,000 | Flash | 10 s |
 | 7 | How the model makes a decision, every evening | Speak | 25 s |
 | 8 | What the model looks at: 15 measurements | Speak | 20 s |
-| 9 | What the model predicts: what kind of week is next | Speak | 25 s |
+| 9 | What the model predicts: Buy, Hold or Sell for 5 days | Speak | 25 s |
 | 10 | No cheating: textbook, practice exam, final exam | Speak | 45 s |
 | 11 | Choosing the model: the random forest scored best | Speak | 30 s |
 | 12 | What a random forest is, and why it won | Skip | — |
@@ -31,22 +31,23 @@ Module 3 Group 7 · goes with `SPY_Model_Presentation.pptx` (29 slides) · **abo
 | 23 | Version 3: correct the odds first | Speak | 20 s |
 | 24 | With honest odds, the best rule is: don’t trade | Speak | 20 s |
 | 25 | Which model, and how accurate? | Speak | 25 s |
-| 26 | How we kept the test honest | Speak | 25 s |
-| 27 | A flaw of machine learning, or of the question? | Speak | 25 s |
-| 28 | What we learned | Speak | 20 s |
-| 29 | Questions (closing) | Flash | 10 s |
+| 26 | One decision a week: the brief’s literal reading | Speak | 25 s |
+| 27 | How we kept the test honest | Speak | 25 s |
+| 28 | A flaw of machine learning, or of the question? | Speak | 25 s |
+| 29 | What we learned | Speak | 20 s |
+| 30 | Questions (closing) | Flash | 10 s |
 
 ## 1. Cover (~20 s)
 
-We’re Group 7. Our question: with $100,000 in the US stock market, can a machine-learning model that decides each day whether to be in or out beat simply buying and waiting? The brief grades method, not profit, so we’ll show what we built and how we tested it.
+We’re Group 7. As the brief asks, our model predicts the best action for SPY over the next 5 trading days: Buy, Hold or Sell. The question: with $100,000, does trading on those predictions beat simply buying and waiting? The brief grades method, not profit, so we’ll show what we built and how we tested it.
 
 ## 2. What we delivered (~40 s)
 
-Here’s everything the brief asked for and where to find it. An exploratory notebook on the features and the class balance. A modelling notebook with lagged features, time-ordered splits and tuning. A realistic backtest with fees and slippage, plotted against Buy & Hold. And a lessons-learned report. On top of that, two improved versions, each planned before any code was written. Throughout, 46 automated tests check that nothing sees the future.
+Here’s everything the brief asked for and where to find it. An exploratory notebook on the features and the class balance. A modelling notebook with lagged features, time-ordered splits and tuning. A realistic backtest with fees and slippage, plotted against Buy & Hold. And a lessons-learned report. On top of that, two improved versions, each planned before any code was written. Throughout, 50 automated tests check that nothing sees the future.
 
 ## 3. The question in one picture · flash, one line (~10 s)
 
-Option A: buy once and wait. Option B: the model decides every day, and pays a fee each time it switches.
+Option A: buy once and wait. Option B: follow the model’s Buy, Hold or Sell prediction for the next 5 days, paying a fee on every trade.
 
 ## 4. Five words you’ll hear today · skip: click past
 
@@ -62,13 +63,13 @@ Note the flat orange stretch: the model sat in cash from December 2023 to April 
 
 ## 7. How the model makes a decision, every evening (~25 s)
 
-Every evening the model measures the market, predicts next week as up, down or flat, turns that into “in the market or in cash”, and trades at the next morning’s price. Deciding after the close and trading next morning means it never trades at a price it has already seen.
+Every evening the model measures the market and predicts the action for the next 5 trading days: Buy, Hold or Sell. Buy means be invested, Sell means move to cash, Hold means keep the current position. Any change fills at the next morning’s open, so it never trades at a price it has already seen. A fresh 5-day prediction is made each day; slide 26 shows the once-a-week version.
 
 ## 8. What the model looks at: 15 measurements (~20 s)
 
 The brief asked for returns, at least three technical indicators and a volatility measure, all lagged. We used 15: returns, moving averages, RSI, MACD, Bollinger bands, volatility and volume, each using only data up to that day.
 
-## 9. What the model predicts: what kind of week is next (~25 s)
+## 9. What the model predicts: Buy, Hold or Sell for 5 days (~25 s)
 
 The target uses the brief’s thresholds: up more than 1% in five days is Buy, down more than 1% is Sell, otherwise Hold. Down weeks are rare, about one in five, so the classes are imbalanced. We come back to that on slide 22.
 
@@ -90,7 +91,7 @@ On the final exam it scored 0.41, the same as on practice. But look where the sk
 
 ## 14. Turning predictions into trades (v1’s rule) · flash, one line (~15 s)
 
-The trading rule: in the market when the model leans “up”, cash when it leans “down”, otherwise no change. All in or all out.
+v1’s exact rule: Buy when the model leans “up” by 5 points or more, Sell when it leans “down”, otherwise Hold. All in or all out, and at least 5 days in after buying.
 
 ## 15. Where the $32,832 went (~35 s)
 
@@ -136,18 +137,22 @@ With honest odds, the rule we chose in advance picked a version that never sold:
 
 Across versions: v1 used a random forest; v2 switched to gradient boosting because it chose by money, not score. Accuracy stayed between 41 and 48%, inside the brief’s normal range. Note v3: highest accuracy, lowest macro-F1, because corrected odds mostly call flat weeks. Accuracy alone would mislead.
 
-## 26. How we kept the test honest (~25 s)
+## 26. One decision a week: the brief’s literal reading (~25 s)
 
-How we kept it honest: plans written and fingerprinted before any code, each final exam opened once, 46 automated look-ahead tests, and every change or failure logged rather than hidden.
+The brief says “predict the optimal action over the next 5 trading days”, so we also ran every version deciding just once a week: after Friday’s close, trade at Monday’s open, hold all week. It halves the trades and costs, but the result barely moves, still about $32,000 behind Buy & Hold. The weakness is what the model predicts, not how often it acts.
 
-## 27. A flaw of machine learning, or of the question? (~25 s)
+## 27. How we kept the test honest (~25 s)
+
+How we kept it honest: plans written and fingerprinted before any code, each final exam opened once, 50 automated look-ahead tests, and every change or failure logged rather than hidden.
+
+## 28. A flaw of machine learning, or of the question? (~25 s)
 
 Is this a flaw of machine learning? Mostly it’s the question: predicting next week’s direction for the most-watched fund in the world from its own public prices. Machine learning helps elsewhere, like ranking many stocks or forecasting risk. That’s why our fair bar was beating random timing, not just beating Buy & Hold.
 
-## 28. What we learned (~20 s)
+## 29. What we learned (~20 s)
 
 Four lessons: the size of a move is predictable, the direction isn’t; sitting in cash has a cost; the past changes; and good predictions don’t automatically make good trades.
 
-## 29. Questions (closing) · flash, one line (~10 s)
+## 30. Questions (closing) · flash, one line (~10 s)
 
 Everything is in the repository on screen. Thank you, and we’re happy to take questions.

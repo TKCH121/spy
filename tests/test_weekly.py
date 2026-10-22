@@ -9,7 +9,11 @@ from src import v2, weekly
 def test_week_ends_are_last_trading_day_of_each_week():
     idx = pd.bdate_range("2024-03-25", "2024-04-12").drop(pd.Timestamp("2024-03-29"))  # Good Friday
     ends = weekly.week_end_days(idx)
-    assert list(ends) == [pd.Timestamp("2024-03-28"), pd.Timestamp("2024-04-05"), pd.Timestamp("2024-04-12")]
+    assert list(ends) == [
+        pd.Timestamp("2024-03-28"),
+        pd.Timestamp("2024-04-05"),
+        pd.Timestamp("2024-04-12"),
+    ]
 
 
 def test_actions_only_change_position_at_week_ends():
@@ -23,7 +27,7 @@ def test_actions_only_change_position_at_week_ends():
     for i, d in enumerate(idx[:-1]):
         if d.weekday() != 4:
             assert pos.iloc[i + 1] == pos.iloc[i] or idx[i + 1].weekday() == 4
-    assert (pos.loc[: "2024-01-04"] == 0).all()  # before the first decision: start state
+    assert (pos.loc[:"2024-01-04"] == 0).all()  # before the first decision: start state
 
 
 def test_trade_fills_at_next_open_and_is_held_all_week():
