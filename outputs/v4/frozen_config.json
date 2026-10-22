@@ -1,0 +1,21 @@
+{
+  "version": "v4",
+  "model": "HGB",
+  "tau": 0.4,
+  "params": {
+    "clf__l2_regularization": 0.17336465350777208,
+    "clf__learning_rate": 0.032268708256236636,
+    "clf__max_depth": 3,
+    "clf__max_iter": 51,
+    "clf__min_samples_leaf": 153
+  },
+  "label": "next 5 days open\u2192open: Sell < \u22122%, Buy > +1%, else Hold",
+  "probabilities": "balanced weights + prior correction (C2)",
+  "decision": "weekly; cash for the week if P(Sell) \u2265 tau, else invested",
+  "selection": "target met",
+  "dev_cagr": 0.1198,
+  "dev_max_drawdown": -0.3372,
+  "dev_bh_cagr": 0.1223,
+  "dev_bh_max_drawdown": -0.3372,
+  "frozen_before_test": true
+}

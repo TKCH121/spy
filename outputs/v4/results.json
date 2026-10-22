@@ -1,0 +1,240 @@
+{
+  "frozen": {
+    "version": "v4",
+    "model": "HGB",
+    "tau": 0.4,
+    "params": {
+      "clf__l2_regularization": 0.17336465350777208,
+      "clf__learning_rate": 0.032268708256236636,
+      "clf__max_depth": 3,
+      "clf__max_iter": 51,
+      "clf__min_samples_leaf": 153
+    },
+    "label": "next 5 days open\u2192open: Sell < \u22122%, Buy > +1%, else Hold",
+    "probabilities": "balanced weights + prior correction (C2)",
+    "decision": "weekly; cash for the week if P(Sell) \u2265 tau, else invested",
+    "selection": "target met",
+    "dev_cagr": 0.1198,
+    "dev_max_drawdown": -0.3372,
+    "dev_bh_cagr": 0.1223,
+    "dev_bh_max_drawdown": -0.3372,
+    "frozen_before_test": true
+  },
+  "development": [
+    {
+      "model": "LR",
+      "tau": 0.2,
+      "cagr": 0.0427,
+      "share_of_bh_return": 0.3491414554374489,
+      "max_drawdown": -0.3488,
+      "sharpe": 0.32,
+      "time_invested": 0.881,
+      "round_trips": 31,
+      "final_value": 151911.16
+    },
+    {
+      "model": "LR",
+      "tau": 0.3,
+      "cagr": 0.0871,
+      "share_of_bh_return": 0.7121831561733442,
+      "max_drawdown": -0.3489,
+      "sharpe": 0.541,
+      "time_invested": 0.983,
+      "round_trips": 6,
+      "final_value": 230335.64
+    },
+    {
+      "model": "LR",
+      "tau": 0.4,
+      "cagr": 0.1104,
+      "share_of_bh_return": 0.9026982829108748,
+      "max_drawdown": -0.3372,
+      "sharpe": 0.653,
+      "time_invested": 0.994,
+      "round_trips": 3,
+      "final_value": 284707.35
+    },
+    {
+      "model": "RF",
+      "tau": 0.2,
+      "cagr": 0.0886,
+      "share_of_bh_return": 0.7244480784955029,
+      "max_drawdown": -0.2146,
+      "sharpe": 0.633,
+      "time_invested": 0.876,
+      "round_trips": 28,
+      "final_value": 233519.16
+    },
+    {
+      "model": "RF",
+      "tau": 0.3,
+      "cagr": 0.0935,
+      "share_of_bh_return": 0.7645134914145544,
+      "max_drawdown": -0.3106,
+      "sharpe": 0.587,
+      "time_invested": 0.979,
+      "round_trips": 5,
+      "final_value": 244181.59
+    },
+    {
+      "model": "RF",
+      "tau": 0.4,
+      "cagr": 0.1093,
+      "share_of_bh_return": 0.8937040065412918,
+      "max_drawdown": -0.3489,
+      "sharpe": 0.652,
+      "time_invested": 0.998,
+      "round_trips": 2,
+      "final_value": 281904.9
+    },
+    {
+      "model": "HGB",
+      "tau": 0.2,
+      "cagr": 0.0742,
+      "share_of_bh_return": 0.60670482420278,
+      "max_drawdown": -0.2221,
+      "sharpe": 0.543,
+      "time_invested": 0.866,
+      "round_trips": 31,
+      "final_value": 204488.1
+    },
+    {
+      "model": "HGB",
+      "tau": 0.3,
+      "cagr": 0.0983,
+      "share_of_bh_return": 0.8037612428454619,
+      "max_drawdown": -0.2951,
+      "sharpe": 0.613,
+      "time_invested": 0.981,
+      "round_trips": 6,
+      "final_value": 255239.69
+    },
+    {
+      "model": "HGB",
+      "tau": 0.4,
+      "cagr": 0.1198,
+      "share_of_bh_return": 0.9795584627964022,
+      "max_drawdown": -0.3372,
+      "sharpe": 0.697,
+      "time_invested": 0.998,
+      "round_trips": 2,
+      "final_value": 309788.82
+    }
+  ],
+  "development_bh": {
+    "strategy": "",
+    "final_value": 316843.58,
+    "total_return": 2.1684,
+    "cagr": 0.1223,
+    "ann_vol": 0.1737,
+    "sharpe_excess": 0.708,
+    "max_drawdown": -0.3372,
+    "round_trips": 1,
+    "exposure": 1.0,
+    "total_fees": 99.9
+  },
+  "results": {
+    "2023\u201324 test": {
+      "v4": {
+        "strategy": "",
+        "final_value": 156546.25,
+        "total_return": 0.5655,
+        "cagr": 0.2523,
+        "ann_vol": 0.1283,
+        "sharpe_excess": 1.43,
+        "max_drawdown": -0.0997,
+        "round_trips": 1,
+        "exposure": 1.0,
+        "total_fees": 99.9
+      },
+      "buy_and_hold": {
+        "strategy": "",
+        "final_value": 156546.25,
+        "total_return": 0.5655,
+        "cagr": 0.2523,
+        "ann_vol": 0.1283,
+        "sharpe_excess": 1.43,
+        "max_drawdown": -0.0997,
+        "round_trips": 1,
+        "exposure": 1.0,
+        "total_fees": 99.9
+      },
+      "beats_random": null,
+      "classification": {
+        "n": 496,
+        "accuracy": 0.5645,
+        "macro_f1": 0.3382,
+        "recall_Sell": 0.0,
+        "log_loss": 0.8857
+      }
+    },
+    "2013\u201324 walk-forward": {
+      "v4": {
+        "strategy": "",
+        "final_value": 488154.28,
+        "total_return": 3.8815,
+        "cagr": 0.1414,
+        "ann_vol": 0.1664,
+        "sharpe_excess": 0.791,
+        "max_drawdown": -0.3372,
+        "round_trips": 2,
+        "exposure": 0.998,
+        "total_fees": 539.59
+      },
+      "buy_and_hold": {
+        "strategy": "",
+        "final_value": 499270.92,
+        "total_return": 3.9927,
+        "cagr": 0.1436,
+        "ann_vol": 0.167,
+        "sharpe_excess": 0.8,
+        "max_drawdown": -0.3372,
+        "round_trips": 1,
+        "exposure": 1.0,
+        "total_fees": 99.9
+      },
+      "beats_random": 0.45,
+      "classification": {
+        "n": 3014,
+        "accuracy": 0.567,
+        "macro_f1": 0.3593,
+        "recall_Sell": 0.0,
+        "log_loss": 0.9115
+      }
+    },
+    "2025\u201326 holdout": {
+      "v4": {
+        "strategy": "",
+        "final_value": 139986.22,
+        "total_return": 0.3999,
+        "cagr": 0.2098,
+        "ann_vol": 0.1683,
+        "sharpe_excess": 0.986,
+        "max_drawdown": -0.1876,
+        "round_trips": 2,
+        "exposure": 0.991,
+        "total_fees": 284.58
+      },
+      "buy_and_hold": {
+        "strategy": "",
+        "final_value": 134409.74,
+        "total_return": 0.3441,
+        "cagr": 0.1823,
+        "ann_vol": 0.1694,
+        "sharpe_excess": 0.844,
+        "max_drawdown": -0.1876,
+        "round_trips": 1,
+        "exposure": 1.0,
+        "total_fees": 99.9
+      },
+      "beats_random": 0.494,
+      "classification": {
+        "n": 439,
+        "accuracy": 0.6059,
+        "macro_f1": 0.396,
+        "recall_Sell": 0.025,
+        "log_loss": 0.8708
+      }
+    }
+  }
+}
