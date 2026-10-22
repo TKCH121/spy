@@ -64,6 +64,9 @@ def test_walk_forward_never_reads_labels_after_its_window(ds, kind):
     shuffled.loc[tail.index, "r_fwd"] = rng.normal(0, 0.05, size=len(tail))
     again = v3.walk_forward_proba(shuffled, kind, [2016], PARAMS)
     assert np.allclose(base[config.CLASSES].to_numpy(), again[config.CLASSES].to_numpy())
+    mu_cols = [f"mu_{n}" for n in config.CLASS_NAMES.values()]
+    assert np.allclose(base[mu_cols].to_numpy(), again[mu_cols].to_numpy())
+    assert np.allclose(v3.expected_return(base), v3.expected_return(again))
 
 
 def test_probabilities_are_valid(ds):

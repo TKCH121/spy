@@ -74,7 +74,8 @@ def training_window(ds: pd.DataFrame, year: int) -> pd.DataFrame:
 
 def walk_forward_proba(ds: pd.DataFrame, kind: str, years, params: dict) -> pd.DataFrame:
     """Out-of-sample probabilities for every day of `years`, refitting each January.
-    Adds the fit's training class shares as prior_* columns (for the calibration report)."""
+    Adds the fit's training class shares (prior_*) and class mean forward returns (mu_*),
+    both from the same training rows, so E[r] can be formed without reading later data."""
     out = []
     for year in years:
         hist = training_window(ds, year)
@@ -83,10 +84,17 @@ def walk_forward_proba(ds: pd.DataFrame, kind: str, years, params: dict) -> pd.D
             continue
         cand = Candidate(kind, params).fit(hist[FEATURE_COLS], hist["label"])
         p = cand.predict_proba(days[FEATURE_COLS])
+        mu = hist["r_fwd"].groupby(hist["label"].astype(int)).mean()
         for k in config.CLASSES:
             p[f"prior_{config.CLASS_NAMES[k]}"] = cand.priors_[k]
+            p[f"mu_{config.CLASS_NAMES[k]}"] = mu[k]
         out.append(p)
     return pd.concat(out)
+
+
+def expected_return(wf: pd.DataFrame) -> pd.Series:
+    """E[r] = sum_k P_k * mu_k, using each row's own fit's class means."""
+    return sum(wf[k] * wf[f"mu_{config.CLASS_NAMES[k]}"] for k in config.CLASSES)
 
 
 # --- calibration diagnostics (design note §5.1) ------------------------------------------
