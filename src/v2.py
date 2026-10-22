@@ -241,3 +241,53 @@ def out_of_market_attribution(held: pd.Series, prices: pd.DataFrame) -> pd.DataF
             )
         i += l
     return pd.DataFrame(rows)
+
+
+# --- partial positions ------------------------------------------------------------------
+
+
+def simulate_weights(
+    held_w: pd.Series,
+    prices: pd.DataFrame,
+    rf_daily=None,
+    fees=config.FEES,
+    slippage=config.SLIPPAGE,
+    init_cash=config.INIT_CASH,
+) -> pd.DataFrame:
+    """Backtest with a target weight in SPY (0 to 1) for each day, set at Open(d). Trades
+    pay fees and slippage on the amount traded; the cash part earns rf_daily overnight.
+    With weights of only 0 and 1 it reproduces `simulate` exactly."""
+    prices = prices.loc[held_w.index]
+    rf = np.zeros(len(held_w)) if rf_daily is None else rf_daily.reindex(held_w.index).to_numpy()
+    o, c, w = prices["Open"].to_numpy(), prices["Close"].to_numpy(), held_w.to_numpy(float)
+    cash, shares, prev, values, fee_s = float(init_cash), 0.0, 0.0, [], []
+    for i in range(len(w)):
+        fee = 0.0
+        if i > 0 and cash > 0:
+            cash *= 1 + rf[i]
+        if w[i] != prev:
+            target_value = w[i] * (cash + shares * o[i])
+            if target_value > shares * o[i]:  # buy
+                fill = o[i] * (1 + slippage)
+                delta = (target_value - shares * o[i]) / (fill * (1 + fees))
+                fee = delta * fill * fees
+                cash -= delta * fill + fee
+            else:  # sell
+                delta = (target_value - shares * o[i]) / o[i]
+                gross = -delta * o[i] * (1 - slippage)
+                fee = gross * fees
+                cash += gross - fee
+            shares += delta
+            prev = w[i]
+        values.append(cash + shares * c[i])
+        fee_s.append(fee)
+    return pd.DataFrame({"value": values, "fees": fee_s}, index=held_w.index)
+
+
+def summarize_weights(sim: pd.DataFrame, held_w: pd.Series, rf_daily=None, name: str = "") -> dict:
+    """`summarize` for partial positions: exposure is the average weight; trades counts
+    every change of position."""
+    s = summarize(sim, (held_w > 0).astype(int), rf_daily, name)
+    s["exposure"] = round(float(held_w.mean()), 3)
+    s["position_changes"] = int((held_w.diff().fillna(0) != 0).sum())
+    return s

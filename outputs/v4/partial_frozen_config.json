@@ -1,0 +1,16 @@
+{
+  "strategy": "partial positions",
+  "a": 0.3,
+  "b": 0.4,
+  "model": "HGB",
+  "selection": "target met",
+  "dev_cagr": 0.1093,
+  "dev_max_drawdown": -0.3127,
+  "dev_sharpe": 0.666,
+  "dev_bh": {
+    "cagr": 0.1223,
+    "max_drawdown": -0.3372,
+    "sharpe_excess": 0.708
+  },
+  "frozen_before_reporting": true
+}

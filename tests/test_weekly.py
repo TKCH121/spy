@@ -49,3 +49,36 @@ def test_expected_return_rule_uses_week_end_values_only():
     pos = weekly.weekly_positions_from_er(er, "long")
     assert pos[idx.weekday == 4].tolist() == [0, 1, 1]
     assert np.array_equal(pos.loc["2024-01-08":"2024-01-11"], [0, 0, 0, 0])
+
+
+def test_weekly_weights_follow_risk_bands():
+    idx = pd.bdate_range("2024-01-01", "2024-01-26")
+    p = pd.Series(0.05, index=idx)
+    p[idx.weekday == 4] = [0.10, 0.25, 0.45, 0.10]
+    w = weekly.weekly_weights_from_risk(p, half_at=0.20, zero_at=0.40)
+    assert w[idx.weekday == 4].tolist() == [1.0, 0.5, 0.0, 1.0]
+    assert (w.loc[:"2024-01-04"] == 1.0).all()
+
+
+def test_weight_simulator_matches_all_in_simulator(synthetic_ohlcv):
+    prices = synthetic_ohlcv.loc["2023-01-01":"2024-12-31"]
+    rng = np.random.default_rng(3)
+    held = pd.Series((rng.random(len(prices)) > 0.5).astype(int), index=prices.index)
+    held = held.rolling(5).max().fillna(0).astype(int)
+    rf = pd.Series(0.0002, index=prices.index)
+    a = v2.simulate(held, prices, rf)
+    b = v2.simulate_weights(held.astype(float), prices, rf)
+    assert np.allclose(a["value"], b["value"], rtol=1e-10)
+    assert np.allclose(a["fees"], b["fees"], rtol=1e-10, atol=1e-9)
+
+
+def test_half_position_pays_costs_on_half_and_earns_interest_on_cash(synthetic_ohlcv):
+    prices = synthetic_ohlcv.iloc[:3]
+    held = pd.Series([0.5, 0.5, 0.5], index=prices.index)
+    sim = v2.simulate_weights(held, prices, pd.Series(0.001, index=prices.index))
+    o0 = prices["Open"].iloc[0]
+    fill = o0 * 1.0005
+    shares = 50_000 / (fill * 1.001)
+    assert np.isclose(sim["fees"].iloc[0], shares * fill * 0.001)
+    cash = 50_000 * 1.001**2
+    assert np.isclose(sim["value"].iloc[2], cash + shares * prices["Close"].iloc[2])

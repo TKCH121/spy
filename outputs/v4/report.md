@@ -61,3 +61,29 @@ Can a weekly Buy / Hold / Sell model keep most of the S&P 500's return while cut
 - **Partial positions instead of all-in / all-out.** For example, hold 50% when P(Sell) is high, which reduces exposure without leaving the market.
 - **Volatility-based sizing,** which v1's follow-up research found gave a better Sharpe with a much smaller drawdown over 2013–22.
 - **Additional risk data,** such as the VIX term structure or credit spreads, with the same discipline on what was known when.
+
+## Strategy variant: partial positions (0% / 50% / 100%)
+
+Plan: [docs/v4_partial_positions_note.md](../../docs/v4_partial_positions_note.md), written before the test · notebook `notebooks/v4_partial_positions.ipynb` · same frozen model.
+
+**Rule:** each week, hold **100%** below P(large loss) `a`, **50%** from `a` to below `b`, and **0%** at `b` or above. Selection used the same target as v4 (2013–22).
+
+| Development 2013–22 | Annual return | Max drawdown | Sharpe | Average position |
+|---|---|---|---|---|
+| Buy & Hold | 12.2% | −33.7% | 0.71 | 100% |
+| Partial 0.20 / 0.30 | 8.7% | −24.2% | 0.61 | 92% |
+| Partial 0.20 / 0.40 | 9.7% | −26.2% | 0.66 | 93% |
+| All-in/out at 0.30 (for comparison) | 9.8% | −29.5% | 0.61 | 98% |
+| **Partial 0.30 / 0.40** ✔ pick | 10.9% | −31.3% | 0.67 | 99% |
+| All-in/out at 0.40 (the final model) | 12.0% | −33.7% | 0.70 | 100% |
+
+| Reported | Partial (pick) | Final (all-in/out) | Buy & Hold |
+|---|---|---|---|
+| 2023–24 test | $156,546 | $156,546 | $156,546 |
+| 2013–24 walk-forward | $444,365 (max drawdown −31.3%, Sharpe 0.77) | $488,154 (−33.7%, 0.79) | $499,271 (−33.7%, 0.80) |
+| 2025–26 holdout | $139,986 | $139,986 | $134,410 |
+
+**Verdict against the pre-set test: not a meaningful improvement.**
+- Holding half a position in uncertain weeks gives a few slightly better points on the return-versus-drawdown trade-off. But it is not a clearly better frontier, and its Sharpe over 2013–24 was lower than buy-and-hold's.
+- In 2023–24 and 2025–26 the risk never landed in the 50% band, so it behaved exactly like the all-in/out final model.
+- **The constraint is the signal, not the position sizing:** the model's large-loss probability is too weak to cut drawdowns without giving up a similar share of return.

@@ -28,7 +28,7 @@ Seven points to make, in order. Each lists the slides it covers and roughly how 
   - Data is split by time, never shuffled, with a buffer at each boundary.
   - Choices are made on earlier data and frozen; the test is scored once.
   - Slide 8 answers "did you look at the test data?": training and validation were used to choose, nothing else was. It also lists each model's exact settings.
-  - 51 automated tests check for any use of future data.
+  - 54 automated tests check for any use of future data.
 - **The two models (slide 9):** the baseline is a random forest chosen by validation Sharpe. The final model is gradient boosting chosen against a stated target: at least 85% of the market's return with the smallest drawdown, over ten years.
 - **Classification (slide 10):** both beat a random guess, and in both the skill is in recognising turbulent or quiet weeks, not direction.
 
@@ -43,6 +43,7 @@ Seven points to make, in order. Each lists the slides it covers and roughly how 
   - Cutting the worst fall from −34% to −21% would have cost about 28% of the return.
   - No candidate met both targets, so the rule chose the one that kept most of the return.
   - Its two exits both came right after crashes: one helped (April 2025), one cost (April 2020).
+  - We also tested holding 50% in uncertain weeks instead of all-or-nothing. It gave about the same trade-off, so the limit is the signal, not the position sizing.
 
 ## 5. Why, and what we learned along the way (slides 14–15 · ~1.5 min)
 

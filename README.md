@@ -31,7 +31,7 @@ All rows are on one basis: costs included, cash earning the T-bill rate, and Sha
 | **Modelling notebook** (pipeline, features, training, tuning) | [notebooks/02_modeling.ipynb](notebooks/02_modeling.ipynb) | Time-ordered splits with gaps (§1), baselines (§3), tuned candidates in sklearn Pipelines (§4), selection (§7–8), one-time test (§9). The feature formulas are in [src/features.py](src/features.py). |
 | **Realistic backtest** with fees, vs Buy & Hold | [notebooks/03_backtest.ipynb](notebooks/03_backtest.ipynb) (v1) · [notebooks/weekly_v1.ipynb](notebooks/weekly_v1.ipynb)–[v3](notebooks/weekly_v3.ipynb) (weekly) · [scorecard](notebooks/scorecard.ipynb) | 0.10% fee + 0.05% slippage per side, fills at the next open, equity vs Buy & Hold, risk metrics |
 | **Lessons learned** | [outputs/SUMMARY.md](outputs/SUMMARY.md) · [outputs/weekly/report.md](outputs/weekly/report.md) · [outputs/report.md](outputs/report.md) (v1) | Where the models failed, why they lost, why markets are hard |
-| **No look-ahead bias** | [tests/](tests/) (51 tests, run in CI) | Features unchanged when future data is cut or shocked; labels and splits never cross boundaries; no fit reads labels after its window |
+| **No look-ahead bias** | [tests/](tests/) (54 tests, run in CI) | Features unchanged when future data is cut or shocked; labels and splits never cross boundaries; no fit reads labels after its window |
 | **Class imbalance** | `02_modeling` §4 (E04–E08) · [outputs/v3/calibration_report.md](outputs/v3/calibration_report.md) | Class weights vs SMOTE vs none, and what weighting does to the predicted odds |
 
 **Suggested reading order (about 20 minutes):** this page → [outputs/SUMMARY.md](outputs/SUMMARY.md) → notebooks `01` → `02` → `03` → [outputs/weekly/report.md](outputs/weekly/report.md). The slides are in [presentation/](presentation/).
@@ -64,6 +64,7 @@ notebooks/
   weekly_v1.ipynb … weekly_v3.ipynb   v1w, v2w, v3w · rebuilt with weekly decisions
   scorecard.ipynb                     every strategy · return and risk on one basis
   v4_drawdown_aware.ipynb             v4 · near-market return with a smaller drawdown
+  v4_partial_positions.ipynb          v4 · strategy variant: 0 / 50 / 100% positions
 src/
   config.py      design constants (dates, thresholds, costs, gaps)
   data.py        download / load the price snapshot
@@ -78,7 +79,7 @@ src/
   v2.py          expected-return rule, T-bill cash simulator, random timing, bootstrap
   v3.py          probability calibration treatments and their walk-forward
   weekly.py      the weekly decision schedule
-tests/           51 tests: look-ahead, labels, splits, strategies, calibration, weekly schedule
+tests/           54 tests: look-ahead, labels, splits, strategies, calibration, weekly schedule
 outputs/         v1 results · research/ · v2/ · v3/ · weekly/ (incl. v1–v3 rebuilds) · v4/ · scorecard.json
 data/            raw/ price and T-bill snapshots · holdout/ 2025–26 data
 presentation/    slide deck, speaking notes, build files
@@ -106,7 +107,7 @@ conda run -n spy-m3 python -m pytest -q
 ```
 
 ```bash
-cd notebooks && for n in 01_eda 02_modeling 03_backtest 04_strategy_research 05_holdout_2025 v2_02_modeling v3_01_calibration v3_02_development_and_freeze v3_03_test_and_holdout weekly_decisions weekly_v1 weekly_v2 weekly_v3 scorecard v4_drawdown_aware; do conda run -n spy-m3 jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.kernel_name=spy-m3 $n.ipynb; done
+cd notebooks && for n in 01_eda 02_modeling 03_backtest 04_strategy_research 05_holdout_2025 v2_02_modeling v3_01_calibration v3_02_development_and_freeze v3_03_test_and_holdout weekly_decisions weekly_v1 weekly_v2 weekly_v3 scorecard v4_drawdown_aware v4_partial_positions; do conda run -n spy-m3 jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.kernel_name=spy-m3 $n.ipynb; done
 ```
 
 Code style is checked with `ruff check src tests` and `ruff format --check src tests` (config in `ruff.toml`). On some Windows setups, pytest needs `--basetemp` pointing to a writable folder.

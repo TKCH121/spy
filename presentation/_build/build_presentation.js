@@ -16,6 +16,7 @@ const W3 = load("outputs/weekly/v3/results.json");
 const EDA = load("outputs/eda_slides.json");
 const V4 = load("outputs/v4/results.json");
 const V4P = load("outputs/v4/paths.json");
+const PP = load("outputs/v4/partial_results.json");
 const T = "2023–24 test", WF = "2013–24 walk-forward", HO = "2025–26 holdout";
 const sc = (strategy, period) => SC.find((r) => r.strategy === strategy && r.period === period);
 // Baseline = v1 rebuilt weekly (v1w); Final = v4. Both expressed with the same fields.
@@ -103,7 +104,7 @@ s.addTable([
   ["Backtest", "notebooks/03_backtest, scorecard", "Costs, comparison with buy-and-hold, risk metrics"],
   ["Lessons learned", "outputs/SUMMARY.md", "Why the strategies performed as they did; limits of prediction"],
 ], Object.assign({ x: M, y: 2.55, w: CW, colW: [2.6, 4.4, 5.13], fontSize: 15, rowH: 0.55, margin: [0.05, 0.12, 0.05, 0.12] }, TABLE));
-note(s, "Code, data snapshots and 51 automated tests: github.com/TKCH121/spy", 5.55);
+note(s, "Code, data snapshots and 54 automated tests: github.com/TKCH121/spy", 5.55);
 
 // ---------- 3. approach ----------
 s = content("Approach", S1);
@@ -201,7 +202,7 @@ let sx = M;
 note(s, "Chronological, never shuffled; a buffer of 5–6 trading days at each boundary so no 5-day label overlaps the next period.", 2.4);
 [["Selection before testing", "Model and decision rule chosen on earlier data by rules fixed in advance; the test period is scored once, after freezing."],
  ["Out-of-sample checks", "12-year walk-forward (yearly refits, 2013–2024) and a 2025–26 holdout."],
- ["Leakage tests", "51 automated tests: features, labels, splits and every refit are checked for use of future data."],
+ ["Leakage tests", "54 automated tests: features, labels, splits and every refit are checked for use of future data."],
  ["Written-down designs", "Each design was documented before it was run; later ones fingerprinted (SHA-256)."],
 ].forEach(([t, b], i) => {
   const x = M + (i % 2) * 6.15, y = 3.0 + Math.floor(i / 2) * 1.75;
@@ -227,7 +228,7 @@ s.addTable([
 ], Object.assign({ x: M, y: 4.25, w: CW, colW: [2.7, 5.4, 4.03], fontSize: 12, rowH: 0.42, margin: [0.03, 0.08, 0.03, 0.08] }, TABLE));
 text(s, [
   { text: "Safeguards: ", options: { bold: true, color: C.text1 } },
-  { text: "periods never overlap (5–6 day buffer at each boundary, also inside cross-validation); scaling and resampling fit on training folds only; selection rules written down before results; 51 automated tests check for any use of future data." },
+  { text: "periods never overlap (5–6 day buffer at each boundary, also inside cross-validation); scaling and resampling fit on training folds only; selection rules written down before results; 54 automated tests check for any use of future data." },
 ], { x: M, y: 5.65, w: CW, h: 0.85, fontSize: 13 });
 
 // ---------- 9. baseline vs final ----------
@@ -311,7 +312,7 @@ s.addTable([
 ], Object.assign({ x: M, y: 1.8, w: 7.2, colW: [3.6, 1.2, 1.2, 1.2], fontSize: 12, rowH: 0.45, margin: [0.04, 0.08, 0.04, 0.08] }, TABLE));
 card(s, 8.1, 1.45, 4.63, 2.6, "The trade-off", "Cutting the worst fall by about a third (−34% → −21%) cost about 28% of the return. No candidate met both targets, so the rule chose the one that kept most of the return.", { bodySize: 13, fill: "FBEDE4" });
 card(s, 8.1, 4.25, 4.63, 2.2, "Exits after crashes only", "April 2020: out for a week that rose 2.0%. April 2025: out for a week that fell 4.2% (holdout gain). It reacts to volatility, not direction.", { bodySize: 13 });
-note(s, "Lower-threshold variants exit more often and cut drawdown further, but give up more return.", 4.6);
+note(s, "Lower thresholds cut drawdown further but give up more return. Holding 50% in uncertain weeks (tested, planned in advance) gave about the same trade-off.", 4.55);
 
 // ---------- 14. why the baseline underperformed ----------
 pres.addSection({ title: S4 });
@@ -355,7 +356,7 @@ s = content("A limitation of machine learning, or of the question?", S4);
 
 // ---------- 17. safeguards and limitations ----------
 s = content("Safeguards and limitations", S4);
-card(s, M, 1.5, 5.98, 4.9, "Safeguards", "• Chronological splits with label-length buffers\n• Selection rules fixed before results; tests scored once per design\n• 51 automated leakage tests, run on every change\n• Costs, slippage and interest on cash included\n• Risk metrics and a random-timing benchmark, not only final value", { bodySize: 14, titleSize: 18 });
+card(s, M, 1.5, 5.98, 4.9, "Safeguards", "• Chronological splits with label-length buffers\n• Selection rules fixed before results; tests scored once per design\n• 54 automated leakage tests, run on every change\n• Costs, slippage and interest on cash included\n• Risk metrics and a random-timing benchmark, not only final value", { bodySize: 14, titleSize: 18 });
 card(s, M + 6.15, 1.5, 5.98, 4.9, "Limitations", "• One asset and price-based features only\n• All-in or all-out positions\n• The final model and the 2025–26 holdout came after earlier test results were known; a forward paper-trade from 13 Oct 2026 is the only blind test\n• The final model exited only twice, too few to separate skill from luck", { bodySize: 14, titleSize: 18, fill: "FBEDE4" });
 
 // ---------- 18. conclusions ----------
@@ -385,8 +386,9 @@ s.addTable([
   avRow("Intermediate 1 (v2): expected-return rule", "v2w", "weekly"),
   avRow("Intermediate 2 (v3): corrected probabilities", "v3w", "weekly"),
   ["Final (v4): avoid large losses", "weekly", usd(fin(T).fv), pct(fin(T).dd), usd(fin(WF).fv)],
+  ["Final, partial positions (0 / 50 / 100%)", "weekly", usd(PP.results[T].partial.final_value), pct(PP.results[T].partial.max_drawdown), usd(PP.results[WF].partial.final_value)],
   avRow("v1, original", "v1", "daily"), avRow("v2, original", "v2", "daily"), avRow("v3, original", "v3", "daily"),
-], Object.assign({ x: M, y: 1.45, w: CW, colW: [4.4, 1.4, 2.2, 1.8, 2.33], fontSize: 13, rowH: 0.45, margin: [0.04, 0.1, 0.04, 0.1] }, TABLE));
+], Object.assign({ x: M, y: 1.45, w: CW, colW: [4.4, 1.4, 2.2, 1.8, 2.33], fontSize: 13, rowH: 0.4, margin: [0.04, 0.1, 0.04, 0.1] }, TABLE));
 note(s, "Cash earns T-bills in every row. Intermediate 1 stayed in cash for 2023–24; Intermediate 2 never sold. Full reports: outputs/weekly/report.md, outputs/v2, outputs/v3.", 5.75);
 
 // ---------- appendix B: confusion ----------

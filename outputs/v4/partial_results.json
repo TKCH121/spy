@@ -1,0 +1,262 @@
+{
+  "frozen": {
+    "strategy": "partial positions",
+    "a": 0.3,
+    "b": 0.4,
+    "model": "HGB",
+    "selection": "target met",
+    "dev_cagr": 0.1093,
+    "dev_max_drawdown": -0.3127,
+    "dev_sharpe": 0.666,
+    "dev_bh": {
+      "cagr": 0.1223,
+      "max_drawdown": -0.3372,
+      "sharpe_excess": 0.708
+    },
+    "frozen_before_reporting": true
+  },
+  "development": [
+    {
+      "strategy": "partial 0.15/0.30",
+      "kind": "partial",
+      "a": 0.15,
+      "b": 0.3,
+      "final_value": 168488.52,
+      "cagr": 0.0536,
+      "max_drawdown": -0.2132,
+      "sharpe_excess": 0.437,
+      "exposure": 0.834,
+      "position_changes": 105,
+      "share_of_bh_return": 0.4382665576451349
+    },
+    {
+      "strategy": "partial 0.20/0.30",
+      "kind": "partial",
+      "a": 0.2,
+      "b": 0.3,
+      "final_value": 230032.42,
+      "cagr": 0.0869,
+      "max_drawdown": -0.2415,
+      "sharpe_excess": 0.606,
+      "exposure": 0.923,
+      "position_changes": 71,
+      "share_of_bh_return": 0.7105478331970564
+    },
+    {
+      "strategy": "partial 0.20/0.40",
+      "kind": "partial",
+      "a": 0.2,
+      "b": 0.4,
+      "final_value": 252989.22,
+      "cagr": 0.0973,
+      "max_drawdown": -0.2623,
+      "sharpe_excess": 0.663,
+      "exposure": 0.932,
+      "position_changes": 63,
+      "share_of_bh_return": 0.7955846279640229
+    },
+    {
+      "strategy": "partial 0.25/0.40",
+      "kind": "partial",
+      "a": 0.25,
+      "b": 0.4,
+      "final_value": 261545.56,
+      "cagr": 0.101,
+      "max_drawdown": -0.3127,
+      "sharpe_excess": 0.631,
+      "exposure": 0.976,
+      "position_changes": 20,
+      "share_of_bh_return": 0.8258381030253475
+    },
+    {
+      "strategy": "partial 0.30/0.40",
+      "kind": "partial",
+      "a": 0.3,
+      "b": 0.4,
+      "final_value": 281999.7,
+      "cagr": 0.1093,
+      "max_drawdown": -0.3127,
+      "sharpe_excess": 0.666,
+      "exposure": 0.989,
+      "position_changes": 12,
+      "share_of_bh_return": 0.8937040065412918
+    },
+    {
+      "strategy": "all-in/out 0.20",
+      "kind": "all-in/out",
+      "a": 0.2,
+      "b": 0.2,
+      "final_value": 204488.1,
+      "cagr": 0.0742,
+      "max_drawdown": -0.2221,
+      "sharpe_excess": 0.543,
+      "exposure": 0.866,
+      "position_changes": 61,
+      "share_of_bh_return": 0.60670482420278
+    },
+    {
+      "strategy": "all-in/out 0.30",
+      "kind": "all-in/out",
+      "a": 0.3,
+      "b": 0.3,
+      "final_value": 255239.69,
+      "cagr": 0.0983,
+      "max_drawdown": -0.2951,
+      "sharpe_excess": 0.613,
+      "exposure": 0.981,
+      "position_changes": 10,
+      "share_of_bh_return": 0.8037612428454619
+    },
+    {
+      "strategy": "all-in/out 0.40",
+      "kind": "all-in/out",
+      "a": 0.4,
+      "b": 0.4,
+      "final_value": 309788.82,
+      "cagr": 0.1198,
+      "max_drawdown": -0.3372,
+      "sharpe_excess": 0.697,
+      "exposure": 0.998,
+      "position_changes": 2,
+      "share_of_bh_return": 0.9795584627964022
+    }
+  ],
+  "development_bh": {
+    "strategy": "",
+    "final_value": 316843.58,
+    "total_return": 2.1684,
+    "cagr": 0.1223,
+    "ann_vol": 0.1737,
+    "sharpe_excess": 0.708,
+    "max_drawdown": -0.3372,
+    "round_trips": 1,
+    "exposure": 1.0,
+    "total_fees": 99.9,
+    "position_changes": 0
+  },
+  "results": {
+    "2023\u201324 test": {
+      "partial": {
+        "strategy": "",
+        "final_value": 156546.25,
+        "total_return": 0.5655,
+        "cagr": 0.2523,
+        "ann_vol": 0.1283,
+        "sharpe_excess": 1.43,
+        "max_drawdown": -0.0997,
+        "round_trips": 1,
+        "exposure": 1.0,
+        "total_fees": 99.9,
+        "position_changes": 0
+      },
+      "final_all_in": {
+        "strategy": "",
+        "final_value": 156546.25,
+        "total_return": 0.5655,
+        "cagr": 0.2523,
+        "ann_vol": 0.1283,
+        "sharpe_excess": 1.43,
+        "max_drawdown": -0.0997,
+        "round_trips": 1,
+        "exposure": 1.0,
+        "total_fees": 99.9,
+        "position_changes": 0
+      },
+      "buy_and_hold": {
+        "strategy": "",
+        "final_value": 156546.25,
+        "total_return": 0.5655,
+        "cagr": 0.2523,
+        "ann_vol": 0.1283,
+        "sharpe_excess": 1.43,
+        "max_drawdown": -0.0997,
+        "round_trips": 1,
+        "exposure": 1.0,
+        "total_fees": 99.9,
+        "position_changes": 0
+      }
+    },
+    "2013\u201324 walk-forward": {
+      "partial": {
+        "strategy": "",
+        "final_value": 444365.18,
+        "total_return": 3.4437,
+        "cagr": 0.1325,
+        "ann_vol": 0.1595,
+        "sharpe_excess": 0.769,
+        "max_drawdown": -0.3127,
+        "round_trips": 2,
+        "exposure": 0.991,
+        "total_fees": 1339.61,
+        "position_changes": 12
+      },
+      "final_all_in": {
+        "strategy": "",
+        "final_value": 488154.28,
+        "total_return": 3.8815,
+        "cagr": 0.1414,
+        "ann_vol": 0.1664,
+        "sharpe_excess": 0.791,
+        "max_drawdown": -0.3372,
+        "round_trips": 2,
+        "exposure": 0.998,
+        "total_fees": 539.59,
+        "position_changes": 2
+      },
+      "buy_and_hold": {
+        "strategy": "",
+        "final_value": 499270.92,
+        "total_return": 3.9927,
+        "cagr": 0.1436,
+        "ann_vol": 0.167,
+        "sharpe_excess": 0.8,
+        "max_drawdown": -0.3372,
+        "round_trips": 1,
+        "exposure": 1.0,
+        "total_fees": 99.9,
+        "position_changes": 0
+      }
+    },
+    "2025\u201326 holdout": {
+      "partial": {
+        "strategy": "",
+        "final_value": 139986.22,
+        "total_return": 0.3999,
+        "cagr": 0.2098,
+        "ann_vol": 0.1683,
+        "sharpe_excess": 0.986,
+        "max_drawdown": -0.1876,
+        "round_trips": 2,
+        "exposure": 0.991,
+        "total_fees": 284.58,
+        "position_changes": 2
+      },
+      "final_all_in": {
+        "strategy": "",
+        "final_value": 139986.22,
+        "total_return": 0.3999,
+        "cagr": 0.2098,
+        "ann_vol": 0.1683,
+        "sharpe_excess": 0.986,
+        "max_drawdown": -0.1876,
+        "round_trips": 2,
+        "exposure": 0.991,
+        "total_fees": 284.58,
+        "position_changes": 2
+      },
+      "buy_and_hold": {
+        "strategy": "",
+        "final_value": 134409.74,
+        "total_return": 0.3441,
+        "cagr": 0.1823,
+        "ann_vol": 0.1694,
+        "sharpe_excess": 0.844,
+        "max_drawdown": -0.1876,
+        "round_trips": 1,
+        "exposure": 1.0,
+        "total_fees": 99.9,
+        "position_changes": 0
+      }
+    }
+  }
+}

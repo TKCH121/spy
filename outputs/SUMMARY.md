@@ -63,6 +63,7 @@ v1–v3 asked which way SPY would move. v4 asks: **can the model keep most of th
 - **The selected model is almost always invested.** It matched buy-and-hold on 2023–24 and over 2013–24 ($488,154 vs $499,271). On the 2025–26 holdout it finished **$139,986 vs $134,410**, by stepping out for the week after the April 2025 sell-off.
 - **That was a single decision.** Its only exit in 2013–24 (April 2020) cost money, so it is not evidence of skill.
 - **Both exits came right after a crash:** the model reacts to volatility, not direction, as the EDA predicted.
+- **Partial positions** (50% in uncertain weeks, planned in advance) gave about the same trade-off and a lower Sharpe over 2013–24 ($444,365), so the final model keeps all-in/out positions. See the [v4 report](v4/report.md).
 
 ## What we learned
 
@@ -75,7 +76,7 @@ v1–v3 asked which way SPY would move. v4 asks: **can the model keep most of th
 
 ## How we know the results are honest
 
-- **No look-ahead:** 51 automated tests, run in CI. Cutting or shocking future data must not change any feature or prediction, and no fit may read labels beyond its window.
+- **No look-ahead:** 54 automated tests, run in CI. Cutting or shocking future data must not change any feature or prediction, and no fit may read labels beyond its window.
 - **Time-ordered splits** with label-length gaps, and tuning with `TimeSeriesSplit` using the same gap.
 - **Selection rules and plans written down before results.** The v3 and weekly-rebuild plans are fingerprinted with SHA-256. Each test was opened once per design, and later changes are logged with dates.
 - **Evidence beyond one number:** risk metrics, a random-timing benchmark with matched exposure, bootstrap intervals, and a 12-year walk-forward.

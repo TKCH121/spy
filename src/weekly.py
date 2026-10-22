@@ -45,3 +45,14 @@ def weekly_positions_from_er(
     return _hold_between_decisions(
         v2.positions_from_er(er.loc[days], default, hurdle), er.index, start
     )
+
+
+def weekly_weights_from_risk(
+    p_risk: pd.Series, half_at: float, zero_at: float, start: float = 1.0
+) -> pd.Series:
+    """Partial positions from a week-end risk probability: 100% below `half_at`, 50% from
+    `half_at` to below `zero_at`, 0% at or above `zero_at`. Held until the next week end."""
+    days = week_end_days(p_risk.index)
+    p = p_risk.loc[days]
+    w = pd.Series(1.0, index=days).where(p < half_at, 0.5).where(p < zero_at, 0.0)
+    return w.reindex(p_risk.index).ffill().fillna(start)
