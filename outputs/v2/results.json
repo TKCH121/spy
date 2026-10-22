@@ -173,7 +173,7 @@
       "recall_Sell": 0.0,
       "recall_Hold": 1.0,
       "recall_Buy": 0.0,
-      "log_loss": NaN
+      "log_loss": null
     },
     "B1_stratified": {
       "n": 496.0,
@@ -182,7 +182,7 @@
       "recall_Sell": 0.2396,
       "recall_Hold": 0.4356,
       "recall_Buy": 0.2879,
-      "log_loss": NaN
+      "log_loss": null
     }
   },
   "v1_test_final_value": 123713.66,
