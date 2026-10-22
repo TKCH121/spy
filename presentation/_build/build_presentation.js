@@ -644,8 +644,34 @@ Four: whenever something went wrong, we logged it instead of hiding it. That inc
 
 [~1.5 minutes]`);
 
-// ---------- 19. lessons ----------
+// ---------- 18d. flaw of ML or of the question ----------
 pres.addSection({ title: S5 });
+s = content("A flaw of machine learning, or of the question?", S5);
+const why = [
+  ["Mostly the question", "We asked for next week’s direction of the world’s most-watched fund, using only its own public price history. Simple patterns there get traded away, and no algorithm can find information that isn’t in the data.", "FBEDE4"],
+  ["Partly our own limits", "One fund, all in or all out, price data only, a one-week horizon. Lifting these makes the task easier, but wouldn’t flip the result: even with zero fees, v1 still lost.", C.background2],
+  ["Where machine learning does help", "Ranking many assets against each other, forecasting risk to size positions, and using data most people don’t have. Even there the edges are usually small and shrink after costs.", C.background2],
+  ["The fair bar", "Return for the risk taken, and beating random timing — not simply “more money than Buy & Hold”. That is how we judged every version.", C.background2],
+];
+why.forEach(([t, b, fill], i) => {
+  const y = 1.5 + i * 1.25;
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: M, y, w: CW, h: 1.12, rectRadius: 0.1, fill: { color: fill }, line: { color: fill } });
+  text(s, t, { x: M + 0.3, y, w: 3.6, h: 1.12, fontSize: 19, bold: true, color: C.text1, fontFace: THEME.headFontFace, valign: "middle" });
+  text(s, b, { x: M + 4.1, y, w: CW - 4.35, h: 1.12, fontSize: 16, valign: "middle" });
+});
+note(s, `A question we expect from you: is this a flaw of machine learning, or of the question we asked? Our answer: mostly the question.
+
+We asked a model to predict next week’s direction for SPY — one of the most heavily traded and closely watched funds in the world — using only its own price history. That history is public, so any simple pattern in it tends to be traded away by others. A better algorithm can’t find information that isn’t there.
+
+Our own limits played a part too: one fund, all in or all out, price data only, a one-week horizon. Lifting them would make the task easier, but not enough to flip the result — remember, even with zero fees, version 1 still lost.
+
+Machine learning does help in finance in other ways: ranking many stocks against each other, forecasting risk to decide how much to hold, and using data most people don’t have. Even there, the edges are usually small and shrink after trading costs.
+
+Which is why we judged every version against the fair bar: return for the risk taken, and beating random timing — not just “more money than Buy & Hold”.
+
+[~1.5 minutes]`);
+
+// ---------- 19. lessons ----------
 s = content("What we learned", S5);
 const lessons = [
   ["Size is predictable; direction isn’t", "Big-move weeks cluster together, so the model can see them coming. Which way they go is close to a coin flip."],

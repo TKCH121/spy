@@ -1,6 +1,6 @@
 # Presentation script — Can a computer beat “buy and wait”?
 
-Module 3 Group 7 · goes with `SPY_Model_Presentation.pptx` (25 slides) · about 39 minutes plus questions.
+Module 3 Group 7 · goes with `SPY_Model_Presentation.pptx` (26 slides) · about 40 minutes plus questions.
 
 Read it in your own words rather than word for word. Replace anything in [square brackets] before presenting.
 
@@ -246,7 +246,19 @@ Three: 46 automated tests check that nothing can see the future — for example,
 
 Four: whenever something went wrong, we logged it instead of hiding it. That includes a one-day overlap we found in one of version 1’s experiments, and version 3 failing its own calibration test.
 
-## Slide 24 · What we learned (~1.5 minutes)
+## Slide 24 · A flaw of machine learning, or of the question? (~1.5 minutes)
+
+A question we expect from you: is this a flaw of machine learning, or of the question we asked? Our answer: mostly the question.
+
+We asked a model to predict next week’s direction for SPY — one of the most heavily traded and closely watched funds in the world — using only its own price history. That history is public, so any simple pattern in it tends to be traded away by others. A better algorithm can’t find information that isn’t there.
+
+Our own limits played a part too: one fund, all in or all out, price data only, a one-week horizon. Lifting them would make the task easier, but not enough to flip the result — remember, even with zero fees, version 1 still lost.
+
+Machine learning does help in finance in other ways: ranking many stocks against each other, forecasting risk to decide how much to hold, and using data most people don’t have. Even there, the edges are usually small and shrink after trading costs.
+
+Which is why we judged every version against the fair bar: return for the risk taken, and beating random timing — not just “more money than Buy & Hold”.
+
+## Slide 25 · What we learned (~1.5 minutes)
 
 Four things we’d take away.
 
@@ -258,7 +270,7 @@ Three: the past changes. A signal that worked for ten years actively misled the 
 
 Four: a good prediction score doesn’t automatically make good trades. Version 2 fixed the trading rule and still lost, partly because a setting that improves the prediction score — extra weight on rare down weeks — distorted the odds the rule depended on. And once version 3 corrected those odds, the best rule turned out to be: don’t trade.
 
-## Slide 25 · Questions (closing) (~30 seconds, then Q&A)
+## Slide 26 · Questions (closing) (~30 seconds, then Q&A)
 
 To sum up: $100,000 left alone grew to about $156,500. Our first model grew it to about $123,700, because it could predict how big the next move would be but not which way, and its trading rule only used the direction.
 
