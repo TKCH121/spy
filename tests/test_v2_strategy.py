@@ -50,12 +50,14 @@ def test_cash_earns_daily_interest(synthetic_ohlcv):
     held = pd.Series(0, index=prices.index)
     rf = pd.Series(0.0002, index=prices.index)
     v = v2.simulate(held, prices, rf)["value"]
-    assert np.isclose(v.iloc[-1], config.INIT_CASH * 1.0002 ** 9)
+    assert np.isclose(v.iloc[-1], config.INIT_CASH * 1.0002**9)
 
 
 def test_tbill_rate_is_lagged(tmp_path):
     cal = pd.bdate_range("2024-01-01", periods=5)
-    pd.DataFrame({"IRX": [5.0, 5.2, 5.4, 5.6, 5.8]}, index=cal.rename("Date")).to_csv(tmp_path / "irx.csv")
+    pd.DataFrame({"IRX": [5.0, 5.2, 5.4, 5.6, 5.8]}, index=cal.rename("Date")).to_csv(
+        tmp_path / "irx.csv"
+    )
     rf = v2.load_tbill_daily(cal, tmp_path / "irx.csv")
     assert rf.iloc[0] == 0.0
     assert np.isclose(rf.iloc[1], 5.0 / 100 / 252)

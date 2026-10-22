@@ -18,5 +18,6 @@ def synthetic_ohlcv() -> pd.DataFrame:
     high = np.maximum(open_, close) * (1 + rng.uniform(0, 0.01, len(idx)))
     low = np.minimum(open_, close) * (1 - rng.uniform(0, 0.01, len(idx)))
     vol = rng.integers(5e7, 2e8, len(idx)).astype(float)
-    return pd.DataFrame({"Open": open_, "High": high, "Low": low, "Close": close,
-                         "Volume": vol}, index=idx)
+    return pd.DataFrame(
+        {"Open": open_, "High": high, "Low": low, "Close": close, "Volume": vol}, index=idx
+    )

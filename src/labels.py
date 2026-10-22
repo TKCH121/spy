@@ -34,8 +34,9 @@ def to_class(r: pd.Series, buy_thr=config.BUY_THR, sell_thr=config.SELL_THR) -> 
     """Map returns to Buy=1 / Hold=0 / Sell=-1. NaN returns stay NaN.
 
     buy_thr / sell_thr may be scalars or Series aligned with r (volatility-scaled)."""
-    out = pd.Series(np.where(r > buy_thr, 1, np.where(r < sell_thr, -1, 0)),
-                    index=r.index, dtype="float")
+    out = pd.Series(
+        np.where(r > buy_thr, 1, np.where(r < sell_thr, -1, 0)), index=r.index, dtype="float"
+    )
     out[r.isna()] = np.nan
     return out
 

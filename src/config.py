@@ -49,8 +49,16 @@ SEED = 42
 #   signal rule -> highest after-cost Sharpe on the validation-period backtest;
 #                  ties broken by fewer trades.
 # Frozen at the end of P6 (mirrors outputs/frozen_config.json, written by 02_modeling).
-FINAL_MODEL = {"experiment": "E06", "model": "RandomForestClassifier",
-               "params": {"class_weight": "balanced", "n_estimators": 300, "max_depth": None,
-                          "max_features": "sqrt", "min_samples_leaf": 68},
-               "features": "all 15 (FEATURE_COLS)"}
+FINAL_MODEL = {
+    "experiment": "E06",
+    "model": "RandomForestClassifier",
+    "params": {
+        "class_weight": "balanced",
+        "n_estimators": 300,
+        "max_depth": None,
+        "max_features": "sqrt",
+        "min_samples_leaf": 68,
+    },
+    "features": "all 15 (FEATURE_COLS)",
+}
 FINAL_SIGNAL_RULE = {"margin": 0.05, "min_hold": 5}

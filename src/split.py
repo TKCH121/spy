@@ -28,7 +28,7 @@ def get_segments(df: pd.DataFrame, gap: int = config.GAP, include_test: bool = F
     }
     if include_test:
         # test is the final segment: its tail is already unlabelled (NaN dropped)
-        segs["test"] = labelled.loc[config.TEST[0]:config.TEST[1]]
+        segs["test"] = labelled.loc[config.TEST[0] : config.TEST[1]]
     assert_chronological(segs, df.index, gap)
     return segs
 

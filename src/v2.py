@@ -71,15 +71,24 @@ def load_tbill_daily(calendar: pd.DatetimeIndex, path=None) -> pd.Series:
     """Daily cash return on the SPY calendar: IRX(t-1) / 100 / 252 (known before day t)."""
     path = path or max(config.RAW_DIR.glob("irx_*.csv"))
     irx = pd.read_csv(path, index_col=0, parse_dates=True)["IRX"]
-    return (irx.reindex(calendar.union(irx.index)).ffill().reindex(calendar)
-            .shift(1).fillna(0.0) / 100 / 252)
+    return (
+        irx.reindex(calendar.union(irx.index)).ffill().reindex(calendar).shift(1).fillna(0.0)
+        / 100
+        / 252
+    )
 
 
 # --- backtest ---------------------------------------------------------------------------
 
 
-def simulate(held: pd.Series, prices: pd.DataFrame, rf_daily=None, fees=config.FEES,
-             slippage=config.SLIPPAGE, init_cash=config.INIT_CASH) -> pd.DataFrame:
+def simulate(
+    held: pd.Series,
+    prices: pd.DataFrame,
+    rf_daily=None,
+    fees=config.FEES,
+    slippage=config.SLIPPAGE,
+    init_cash=config.INIT_CASH,
+) -> pd.DataFrame:
     """All-in / all-out backtest. held[d] = 1 if invested during day d (switches fill at
     Open(d)). Cash earns rf_daily overnight. Returns value, cash return and fees by day."""
     prices = prices.loc[held.index]
@@ -109,8 +118,9 @@ def held_from_positions(pos: pd.Series, start: int = 0) -> pd.Series:
     return pos.shift(1).fillna(start).astype(int)
 
 
-def summarize(sim: pd.DataFrame, held: pd.Series, rf_daily=None, name: str = "",
-              init_cash=config.INIT_CASH) -> dict:
+def summarize(
+    sim: pd.DataFrame, held: pd.Series, rf_daily=None, name: str = "", init_cash=config.INIT_CASH
+) -> dict:
     v = sim["value"]
     r = pd.concat([pd.Series([init_cash]), pd.Series(v.to_numpy())]).pct_change().dropna()
     rf = pd.Series(0.0 if rf_daily is None else rf_daily.reindex(v.index).to_numpy())
@@ -123,7 +133,9 @@ def summarize(sim: pd.DataFrame, held: pd.Series, rf_daily=None, name: str = "",
         "total_return": round(float(total), 4),
         "cagr": round(float((1 + total) ** (1 / years) - 1), 4),
         "ann_vol": round(float(r.std() * np.sqrt(252)), 4),
-        "sharpe_excess": round(float(ex.mean() / ex.std() * np.sqrt(252)), 3) if ex.std() > 0 else 0.0,
+        "sharpe_excess": round(float(ex.mean() / ex.std() * np.sqrt(252)), 3)
+        if ex.std() > 0
+        else 0.0,
         "max_drawdown": round(float((v / v.cummax() - 1).min()), 4),
         "round_trips": int(((held == 1) & (held.shift(1, fill_value=0) == 0)).sum()),
         "exposure": round(float(held.mean()), 3),
@@ -166,8 +178,9 @@ def random_timing_paths(held: pd.Series, n: int = 1000, seed: int = config.SEED)
 
 def random_timing_benchmark(held, prices, rf_daily=None, n: int = 1000) -> pd.Series:
     """Final values of n random-timing paths under the same costs and cash rate."""
-    return pd.Series([simulate(p, prices, rf_daily)["value"].iloc[-1]
-                      for p in random_timing_paths(held, n)])
+    return pd.Series(
+        [simulate(p, prices, rf_daily)["value"].iloc[-1] for p in random_timing_paths(held, n)]
+    )
 
 
 def _block_indices(n: int, block: int, rng) -> np.ndarray:
@@ -175,8 +188,9 @@ def _block_indices(n: int, block: int, rng) -> np.ndarray:
     return (starts[:, None] + np.arange(block)).ravel()[:n] % n
 
 
-def bootstrap_sharpe_diff(r_a: pd.Series, r_b: pd.Series, rf=None, block: int = 20,
-                          n: int = 2000, seed: int = config.SEED) -> np.ndarray:
+def bootstrap_sharpe_diff(
+    r_a: pd.Series, r_b: pd.Series, rf=None, block: int = 20, n: int = 2000, seed: int = config.SEED
+) -> np.ndarray:
     """Circular block bootstrap of Sharpe(a) - Sharpe(b) on paired daily excess returns."""
     rng = np.random.default_rng(seed)
     rf = np.zeros(len(r_a)) if rf is None else np.asarray(rf)
@@ -185,17 +199,21 @@ def bootstrap_sharpe_diff(r_a: pd.Series, r_b: pd.Series, rf=None, block: int = 
     for _ in range(n):
         i = _block_indices(len(a), block, rng)
         sa, sb = a[i].std(), b[i].std()
-        out.append((a[i].mean() / sa if sa > 0 else 0) * np.sqrt(252)
-                   - (b[i].mean() / sb if sb > 0 else 0) * np.sqrt(252))
+        out.append(
+            (a[i].mean() / sa if sa > 0 else 0) * np.sqrt(252)
+            - (b[i].mean() / sb if sb > 0 else 0) * np.sqrt(252)
+        )
     return np.array(out)
 
 
-def bootstrap_f1_diff(y, p_model, p_base, block: int = 20, n: int = 2000,
-                      seed: int = config.SEED) -> np.ndarray:
+def bootstrap_f1_diff(
+    y, p_model, p_base, block: int = 20, n: int = 2000, seed: int = config.SEED
+) -> np.ndarray:
     """Circular block bootstrap of macro-F1(model) - macro-F1(baseline)."""
     rng = np.random.default_rng(seed)
     y, pm, pb = map(np.asarray, (y, p_model, p_base))
     out = []
+
     def f1(idx, p):
         return f1_score(y[idx], p[idx], labels=config.CLASSES, average="macro", zero_division=0)
 
@@ -213,7 +231,13 @@ def out_of_market_attribution(held: pd.Series, prices: pd.DataFrame) -> pd.DataF
     for s, l in spells(held):
         if s == 0 and i > 0:
             end = min(i + l, len(held) - 1)
-            rows.append({"out_from": held.index[i].date(), "back_in": held.index[end].date(),
-                         "days": l, "spy_move": round(float(o.iloc[end] / o.iloc[i] - 1), 4)})
+            rows.append(
+                {
+                    "out_from": held.index[i].date(),
+                    "back_in": held.index[end].date(),
+                    "days": l,
+                    "spy_move": round(float(o.iloc[end] / o.iloc[i] - 1), 4),
+                }
+            )
         i += l
     return pd.DataFrame(rows)

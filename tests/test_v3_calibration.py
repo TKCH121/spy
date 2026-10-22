@@ -8,8 +8,13 @@ from src import config, v3
 from src.dataset import build_dataset_v2
 from src.features import FEATURE_COLS
 
-PARAMS = {"clf__max_iter": 30, "clf__max_depth": 3, "clf__min_samples_leaf": 50,
-          "clf__learning_rate": 0.05, "clf__l2_regularization": 0.1}
+PARAMS = {
+    "clf__max_iter": 30,
+    "clf__max_depth": 3,
+    "clf__min_samples_leaf": 50,
+    "clf__learning_rate": 0.05,
+    "clf__l2_regularization": 0.1,
+}
 
 
 @pytest.fixture(scope="module")
@@ -48,7 +53,7 @@ def test_calibration_folds_respect_the_gap(ds):
 def test_training_window_ends_before_the_label_reaches_the_year(ds):
     for year in (2015, 2020):
         hist = v3.training_window(ds, year)
-        first = ds.index.get_loc(ds.loc[f"{year}-01-01":].index.min())
+        first = ds.index.get_loc(ds.loc[f"{year}-01-01" :].index.min())
         assert ds.index.get_loc(hist.index.max()) + config.LABEL_LOOKAHEAD["open"] < first
 
 
@@ -77,7 +82,9 @@ def test_probabilities_are_valid(ds):
 
 def test_calibration_diagnostics():
     y = pd.Series([1, 0, -1, 0], index=pd.date_range("2015-01-01", periods=4))
-    p = pd.DataFrame({-1: [0.0, 0.0, 1.0, 0.0], 0: [0.0, 1.0, 0.0, 1.0], 1: [1.0, 0.0, 0.0, 0.0]}, index=y.index)
+    p = pd.DataFrame(
+        {-1: [0.0, 0.0, 1.0, 0.0], 0: [0.0, 1.0, 0.0, 1.0], 1: [1.0, 0.0, 0.0, 0.0]}, index=y.index
+    )
     assert np.isclose(v3.brier(p, y), 0.0)
     flat = pd.DataFrame(1 / 3, index=y.index, columns=config.CLASSES)
     assert np.isclose(v3.log_loss_multi(flat, y), np.log(3))

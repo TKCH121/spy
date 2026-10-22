@@ -6,8 +6,9 @@ from src import config, labels
 from src.features import FEATURE_COLS, build_features
 
 
-def build_dataset(raw: pd.DataFrame, label_kind: str = "close",
-                  buy_thr=config.BUY_THR, sell_thr=config.SELL_THR) -> pd.DataFrame:
+def build_dataset(
+    raw: pd.DataFrame, label_kind: str = "close", buy_thr=config.BUY_THR, sell_thr=config.SELL_THR
+) -> pd.DataFrame:
     """Return one row per trading day with FEATURE_COLS, r_fwd and label.
 
     label_kind: "close" -> Close(t+5)/Close(t)-1 (project brief, primary)

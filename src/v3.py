@@ -54,8 +54,9 @@ class Candidate:
         if self.kind == "C1":
             self.model_ = self._hgb(None).fit(X, y)
         elif self.kind == "C3":
-            self.model_ = CalibratedClassifierCV(self._hgb("balanced"), method="sigmoid",
-                                                 cv=make_cv(gap=config.V2_GAP)).fit(X, y)
+            self.model_ = CalibratedClassifierCV(
+                self._hgb("balanced"), method="sigmoid", cv=make_cv(gap=config.V2_GAP)
+            ).fit(X, y)
         else:  # C0, C2
             self.model_ = self._hgb("balanced").fit(X, y)
         return self
@@ -68,8 +69,8 @@ class Candidate:
 def training_window(ds: pd.DataFrame, year: int) -> pd.DataFrame:
     """Rows from TRAIN_START whose labels are known before `year` starts: labelled rows
     before Jan 1, minus the last V2_GAP rows (their open->open windows reach into `year`)."""
-    hist = ds.loc[TRAIN_START:pd.Timestamp(f"{year}-01-01") - pd.Timedelta(days=1)]
-    return hist.dropna(subset=["label"]).iloc[:-config.V2_GAP]
+    hist = ds.loc[TRAIN_START : pd.Timestamp(f"{year}-01-01") - pd.Timedelta(days=1)]
+    return hist.dropna(subset=["label"]).iloc[: -config.V2_GAP]
 
 
 def walk_forward_proba(ds: pd.DataFrame, kind: str, years, params: dict) -> pd.DataFrame:
@@ -79,7 +80,7 @@ def walk_forward_proba(ds: pd.DataFrame, kind: str, years, params: dict) -> pd.D
     out = []
     for year in years:
         hist = training_window(ds, year)
-        days = ds.loc[f"{year}-01-01":f"{year}-12-31"]
+        days = ds.loc[f"{year}-01-01" : f"{year}-12-31"]
         if days.empty:
             continue
         cand = Candidate(kind, params).fit(hist[FEATURE_COLS], hist["label"])
@@ -133,8 +134,9 @@ def reliability(proba: pd.DataFrame, labels: pd.Series, k: int, bins: int = 10) 
     """Pooled reliability table for class k: rows grouped into equal-width bins of P(k)."""
     df = proba[[k]].join(labels.rename("y")).dropna(subset=["y"])
     df["bin"] = pd.cut(df[k], np.linspace(0, 1, bins + 1), include_lowest=True)
-    t = df.groupby("bin", observed=True).agg(n=("y", "size"), mean_pred=(k, "mean"),
-                                             actual=("y", lambda s: float((s == k).mean())))
+    t = df.groupby("bin", observed=True).agg(
+        n=("y", "size"), mean_pred=(k, "mean"), actual=("y", lambda s: float((s == k).mean()))
+    )
     return t
 
 
