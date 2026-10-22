@@ -26,3 +26,10 @@ def build_dataset(raw: pd.DataFrame, label_kind: str = "close",
     out["r_fwd"] = r
     out["label"] = labels.to_class(r, buy_thr, sell_thr)
     return out.dropna(subset=FEATURE_COLS)
+
+
+def build_dataset_v2(raw: pd.DataFrame) -> pd.DataFrame:
+    """v2 modelling table: same features and +/-1% classes, but the primary label is
+    execution-aligned (config.V2_LABEL_KIND). It reads one bar further ahead than
+    close->close, so v2 segments and CV must use gap=config.V2_GAP, not config.GAP."""
+    return build_dataset(raw, label_kind=config.V2_LABEL_KIND)
