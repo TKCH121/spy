@@ -1,6 +1,6 @@
 # Presentation script — Can a computer beat “buy and wait”?
 
-Module 3 Group 7 · goes with `SPY_Model_Presentation.pptx` (28 slides) · **about 9 minutes of speaking**, plus clicks and questions.
+Module 3 Group 7 · goes with `SPY_Model_Presentation.pptx` (29 slides) · **about 10 minutes of speaking**, plus clicks and questions.
 
 **Speak** slides carry the deliverables the brief grades. **Flash** slides get one line. **Skip** slides are there as backup for questions: click past them. Say it in your own words. Fill in the presenter names and date on slide 1.
 
@@ -30,10 +30,11 @@ Module 3 Group 7 · goes with `SPY_Model_Presentation.pptx` (28 slides) · **abo
 | 22 | Class imbalance: good for predictions, bad for odds | Speak | 35 s |
 | 23 | Version 3: correct the odds first | Speak | 20 s |
 | 24 | With honest odds, the best rule is: don’t trade | Speak | 20 s |
-| 25 | How we kept the test honest | Speak | 25 s |
-| 26 | A flaw of machine learning, or of the question? | Speak | 25 s |
-| 27 | What we learned | Speak | 20 s |
-| 28 | Questions (closing) | Flash | 10 s |
+| 25 | Which model, and how accurate? | Speak | 25 s |
+| 26 | How we kept the test honest | Speak | 25 s |
+| 27 | A flaw of machine learning, or of the question? | Speak | 25 s |
+| 28 | What we learned | Speak | 20 s |
+| 29 | Questions (closing) | Flash | 10 s |
 
 ## 1. Cover (~20 s)
 
@@ -129,20 +130,24 @@ Version 3 keeps the weights for training, then corrects the odds. On average tha
 
 ## 24. With honest odds, the best rule is: don’t trade (~20 s)
 
-With honest odds, the rule we chose in advance picked a version that never sold in ten years: it is Buy & Hold. Every version that traded did worse.
+With honest odds, the rule we chose in advance picked a version that never sold: not in ten years of history, not in 2023–24, not on the 2025–26 holdout. It is Buy & Hold. Every version that traded did worse.
 
-## 25. How we kept the test honest (~25 s)
+## 25. Which model, and how accurate? (~25 s)
+
+Across versions: v1 used a random forest; v2 switched to gradient boosting because it chose by money, not score. Accuracy stayed between 41 and 48%, inside the brief’s normal range. Note v3: highest accuracy, lowest macro-F1, because corrected odds mostly call flat weeks. Accuracy alone would mislead.
+
+## 26. How we kept the test honest (~25 s)
 
 How we kept it honest: plans written and fingerprinted before any code, each final exam opened once, 46 automated look-ahead tests, and every change or failure logged rather than hidden.
 
-## 26. A flaw of machine learning, or of the question? (~25 s)
+## 27. A flaw of machine learning, or of the question? (~25 s)
 
 Is this a flaw of machine learning? Mostly it’s the question: predicting next week’s direction for the most-watched fund in the world from its own public prices. Machine learning helps elsewhere, like ranking many stocks or forecasting risk. That’s why our fair bar was beating random timing, not just beating Buy & Hold.
 
-## 27. What we learned (~20 s)
+## 28. What we learned (~20 s)
 
 Four lessons: the size of a move is predictable, the direction isn’t; sitting in cash has a cost; the past changes; and good predictions don’t automatically make good trades.
 
-## 28. Questions (closing) · flash, one line (~10 s)
+## 29. Questions (closing) · flash, one line (~10 s)
 
 Everything is in the repository on screen. Thank you, and we’re happy to take questions.

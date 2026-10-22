@@ -116,7 +116,7 @@ const drows = [
   ["Exploratory analysis", "notebooks/01_eda.ipynb", "Feature distributions, indicator correlations, class balance"],
   ["Modelling notebook", "notebooks/02_modeling.ipynb", "Lagged features, time-ordered splits, tuning; random forest chosen"],
   ["Realistic backtest", "notebooks/03_backtest.ipynb", "vectorbt, 0.10% fee + 0.05% slippage, plotted against Buy & Hold"],
-  ["“Lessons learned” report", "outputs/report.md", "Where the model failed, why it lost, why markets are hard"],
+  ["“Lessons learned” report", "outputs/report.md, SUMMARY.md", "Where the model failed, why it lost, why markets are hard"],
   ["Beyond the brief", "v2 and v3 notebooks, docs/", "Two improved versions, planned in advance and tested honestly"],
 ];
 s.addTable(drows, Object.assign({ x: M, y: 1.5, w: CW, colW: [2.9, 3.6, 5.63], fontSize: 16, rowH: 0.6, margin: [0.06, 0.14, 0.06, 0.14] }, TABLE));
@@ -449,9 +449,22 @@ s.addChart(pres.charts.BAR, [{ name: "Value", labels: dv.map((d) => d[0]), value
   valGridLine: { style: "none" }, catGridLine: { style: "none" }, showLegend: false,
   showTitle: true, title: "$100,000 invested 2013–2022, after costs (re-trained each year)",
 }, chartText, { catAxisLabelFontSize: 12 }));
-card(s, 8.8, 1.5, 3.93, 2.5, "The pick never sold", "Chosen by a rule fixed in advance. In ten years it never stepped out of the market: it is Buy & Hold, and it ties Buy & Hold.", { bodySize: 15, titleSize: 18, fill: "FBEDE4" });
-card(s, 8.8, 4.2, 3.93, 2.25, "Every version that traded did worse", "Even the ones invested 95% of the time ended about $70,000 behind.", { bodySize: 15, titleSize: 18 });
-text(s, "Still to come: the frozen pick on 2025–26 data and a live paper-trade from 13 Oct 2026.", { x: M, y: 6.5, w: CW, h: 0.35, fontSize: 13, italic: true, color: C.accent3 });
+card(s, 8.8, 1.5, 3.93, 2.5, "The pick never sold", "Chosen by a rule fixed in advance. It never stepped out of the market: not in 2013–22, not in 2023–24 ($156,546), not on the 2025–26 holdout ($134,410). It is Buy & Hold.", { bodySize: 14, titleSize: 18, fill: "FBEDE4" });
+card(s, 8.8, 4.2, 3.93, 2.25, "Every version that traded did worse", "Even the ones invested 95% of the time ended about $70,000 behind over 2013–22.", { bodySize: 15, titleSize: 18 });
+text(s, "A live paper-trade of the frozen rule runs from 13 Oct 2026.", { x: M, y: 6.5, w: CW, h: 0.35, fontSize: 13, italic: true, color: C.accent3 });
+
+// ---------- model and accuracy across versions ----------
+s = content("Which model, and how accurate?", S4b);
+const arows = [
+  [hdr("Version"), hdr("Model"), hdr("Chosen by"), hdr("Accuracy"), hdr("Macro-F1"), hdr("$100,000 on 2023–24")],
+  ["v1", "Random forest", "Best prediction score", "44.9%", "0.41", usd(T.model_final)],
+  ["v2", "Gradient boosting", "Most money on the practice exam", "40.9%", "0.38", usd(V2T.final_value)],
+  ["v3", "Gradient boosting + corrected odds", "Pre-set rule, 2013–2022", "48.4%", "0.35", usd(BHT.final_value) + " (never trades)"],
+];
+s.addTable(arows, Object.assign({ x: M, y: 1.5, w: CW, colW: [1.1, 3.1, 2.75, 1.35, 1.35, 2.48], fontSize: 15, rowH: 0.62, margin: [0.06, 0.1, 0.06, 0.1] }, TABLE));
+card(s, M, 4.25, 3.93, 2.2, "Why the model changed", "v2 picked the model by money made, not prediction score, so gradient boosting replaced the random forest.", { bodySize: 14, titleSize: 17 });
+card(s, M + 4.1, 4.25, 3.93, 2.2, "Highest accuracy ≠ best", "v3’s corrected odds call the common flat weeks more often: accuracy up, macro-F1 down.", { bodySize: 14, titleSize: 17, fill: "FBEDE4" });
+card(s, M + 8.2, 4.25, 3.93, 2.2, "No sign of a leak", "41–50% across three classes. The brief calls 35–40% normal and warns that 80% means a leak.", { bodySize: 14, titleSize: 17 });
 
 // ---------- honesty ----------
 s = content("How we kept the test honest", S4b);
@@ -531,7 +544,8 @@ const SCRIPT_TEXT = {
   "Why version 2 still lost": ["Skip", 0, "Backup if asked: it stepped out too often (in the market about half the time), its down-week odds were inflated, and there was little direction skill underneath."],
   "Class imbalance: good for predictions, bad for odds": ["Speak", 35, "The brief requires handling class imbalance. We used class weights, after testing SMOTE and no weighting in version 1. Balancing makes the model treat all three kinds of week as equally common, which is good for predictions. But it inflates the odds: the model predicted 30% down weeks against 21% in reality. Version 2 used those odds directly, so it kept selling."],
   "Version 3: correct the odds first": ["Speak", 20, "Version 3 keeps the weights for training, then corrects the odds. On average that works: 21% predicted vs 21% real. But it failed our own year-by-year test, set in advance, and we report that."],
-  "With honest odds, the best rule is: don’t trade": ["Speak", 20, "With honest odds, the rule we chose in advance picked a version that never sold in ten years: it is Buy & Hold. Every version that traded did worse."],
+  "With honest odds, the best rule is: don’t trade": ["Speak", 20, "With honest odds, the rule we chose in advance picked a version that never sold: not in ten years of history, not in 2023–24, not on the 2025–26 holdout. It is Buy & Hold. Every version that traded did worse."],
+  "Which model, and how accurate?": ["Speak", 25, "Across versions: v1 used a random forest; v2 switched to gradient boosting because it chose by money, not score. Accuracy stayed between 41 and 48%, inside the brief’s normal range. Note v3: highest accuracy, lowest macro-F1, because corrected odds mostly call flat weeks. Accuracy alone would mislead."],
   "How we kept the test honest": ["Speak", 25, "How we kept it honest: plans written and fingerprinted before any code, each final exam opened once, 46 automated look-ahead tests, and every change or failure logged rather than hidden."],
   "A flaw of machine learning, or of the question?": ["Speak", 25, "Is this a flaw of machine learning? Mostly it’s the question: predicting next week’s direction for the most-watched fund in the world from its own public prices. Machine learning helps elsewhere, like ranking many stocks or forecasting risk. That’s why our fair bar was beating random timing, not just beating Buy & Hold."],
   "What we learned": ["Speak", 20, "Four lessons: the size of a move is predictable, the direction isn’t; sitting in cash has a cost; the past changes; and good predictions don’t automatically make good trades."],
