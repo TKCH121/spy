@@ -1,0 +1,194 @@
+{
+  "frozen": {
+    "version": "v1w",
+    "model": "RF (E06, unchanged)",
+    "margin": "argmax",
+    "schedule": "weekly: decide after the week's last close, fill next open, hold the week",
+    "val_sharpe": 0.578,
+    "val_final_value": 116257.66,
+    "val_bh_sharpe": 0.217,
+    "plan_sha256": "82602bdd44c1797b167933a11fe610c823d14ef2133ef9eed99a742a59ae644a",
+    "frozen_before_test": true
+  },
+  "validation": [
+    {
+      "margin": "argmax",
+      "final_value": 116257.66,
+      "sharpe_excess": 0.578,
+      "max_drawdown": -0.1326,
+      "round_trips": 20,
+      "exposure": 0.507,
+      "total_fees": 4220.04
+    },
+    {
+      "margin": 0.0,
+      "final_value": 112135.68,
+      "sharpe_excess": 0.464,
+      "max_drawdown": -0.1326,
+      "round_trips": 23,
+      "exposure": 0.429,
+      "total_fees": 4701.04
+    },
+    {
+      "margin": 0.2,
+      "final_value": 100000.0,
+      "sharpe_excess": 0.0,
+      "max_drawdown": 0.0,
+      "round_trips": 0,
+      "exposure": 0.0,
+      "total_fees": 0.0
+    },
+    {
+      "margin": 0.05,
+      "final_value": 93902.06,
+      "sharpe_excess": -0.115,
+      "max_drawdown": -0.2166,
+      "round_trips": 9,
+      "exposure": 0.507,
+      "total_fees": 1733.28
+    },
+    {
+      "margin": 0.1,
+      "final_value": 77850.23,
+      "sharpe_excess": -0.683,
+      "max_drawdown": -0.2566,
+      "round_trips": 2,
+      "exposure": 0.489,
+      "total_fees": 263.86
+    }
+  ],
+  "validation_bh": {
+    "strategy": "Buy & Hold",
+    "final_value": 104773.32,
+    "total_return": 0.0477,
+    "cagr": 0.0236,
+    "ann_vol": 0.1949,
+    "sharpe_excess": 0.217,
+    "max_drawdown": -0.245,
+    "round_trips": 1,
+    "exposure": 1.0,
+    "total_fees": 99.9
+  },
+  "test": {
+    "0% (as built)": {
+      "strategy": "v1w \u00b7 cash 0% (as built)",
+      "final_value": 121899.93,
+      "total_return": 0.219,
+      "cagr": 0.1045,
+      "ann_vol": 0.0985,
+      "sharpe_excess": 1.06,
+      "max_drawdown": -0.1034,
+      "round_trips": 11,
+      "exposure": 0.596,
+      "total_fees": 2495.24
+    },
+    "Buy & Hold \u00b7 0% (as built)": {
+      "strategy": "Buy & Hold \u00b7 cash 0% (as built)",
+      "final_value": 156546.25,
+      "total_return": 0.5655,
+      "cagr": 0.2523,
+      "ann_vol": 0.1283,
+      "sharpe_excess": 1.82,
+      "max_drawdown": -0.0997,
+      "round_trips": 1,
+      "exposure": 1.0,
+      "total_fees": 99.9
+    },
+    "T-bills": {
+      "strategy": "v1w \u00b7 cash T-bills",
+      "final_value": 126864.16,
+      "total_return": 0.2686,
+      "cagr": 0.1269,
+      "ann_vol": 0.0984,
+      "sharpe_excess": 0.756,
+      "max_drawdown": -0.097,
+      "round_trips": 11,
+      "exposure": 0.596,
+      "total_fees": 2554.21
+    },
+    "Buy & Hold \u00b7 T-bills": {
+      "strategy": "Buy & Hold \u00b7 cash T-bills",
+      "final_value": 156546.25,
+      "total_return": 0.5655,
+      "cagr": 0.2523,
+      "ann_vol": 0.1283,
+      "sharpe_excess": 1.43,
+      "max_drawdown": -0.0997,
+      "round_trips": 1,
+      "exposure": 1.0,
+      "total_fees": 99.9
+    }
+  },
+  "evidence": {
+    "beats_random": 0.269,
+    "random_median_final": 133028.42688013797
+  },
+  "attribution": [
+    {
+      "out_from": "2023-02-21",
+      "back_in": "2023-03-27",
+      "days": "24",
+      "spy_move": "-0.0085"
+    },
+    {
+      "out_from": "2023-05-08",
+      "back_in": "2023-06-26",
+      "days": "33",
+      "spy_move": "0.0515"
+    },
+    {
+      "out_from": "2023-07-10",
+      "back_in": "2023-08-07",
+      "days": "20",
+      "spy_move": "0.024"
+    },
+    {
+      "out_from": "2023-08-28",
+      "back_in": "2023-09-18",
+      "days": "14",
+      "spy_move": "0.0054"
+    },
+    {
+      "out_from": "2024-03-18",
+      "back_in": "2024-04-15",
+      "days": "19",
+      "spy_move": "0.0022"
+    },
+    {
+      "out_from": "2024-04-29",
+      "back_in": "2024-05-06",
+      "days": "5",
+      "spy_move": "0.0072"
+    },
+    {
+      "out_from": "2024-06-03",
+      "back_in": "2024-07-22",
+      "days": "33",
+      "spy_move": "0.0487"
+    },
+    {
+      "out_from": "2024-07-29",
+      "back_in": "2024-08-19",
+      "days": "15",
+      "spy_move": "0.016"
+    },
+    {
+      "out_from": "2024-09-09",
+      "back_in": "2024-09-16",
+      "days": "5",
+      "spy_move": "0.0314"
+    },
+    {
+      "out_from": "2024-11-18",
+      "back_in": "2024-12-23",
+      "days": "24",
+      "spy_move": "0.0114"
+    },
+    {
+      "out_from": "2024-12-30",
+      "back_in": "2024-12-31",
+      "days": "2",
+      "spy_move": "0.0034"
+    }
+  ]
+}

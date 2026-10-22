@@ -102,3 +102,10 @@ def test_calibration_pass_rule():
 def test_unknown_candidate_rejected():
     with pytest.raises(ValueError):
         v3.Candidate("C9", PARAMS)
+
+
+def test_candidates_work_with_logistic_regression(ds):
+    lr = {"clf__C": 0.01}
+    for kind in v3.CANDIDATES:
+        p = v3.walk_forward_proba(ds, kind, [2016], lr, model="LR")[config.CLASSES]
+        assert (p.to_numpy() >= 0).all() and np.allclose(p.sum(axis=1), 1)

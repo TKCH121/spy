@@ -1,0 +1,206 @@
+{
+  "frozen": {
+    "version": "v3w",
+    "candidate": "C3-L",
+    "treatment": "C3",
+    "default": "long",
+    "model": "LR",
+    "params": {
+      "clf__C": 0.014618962793704957
+    },
+    "schedule": "weekly",
+    "dev_sharpe_excess": 0.708,
+    "dev_bh_sharpe_excess": 0.708,
+    "calibration_passed": false,
+    "plan_sha256": "82602bdd44c1797b167933a11fe610c823d14ef2133ef9eed99a742a59ae644a",
+    "frozen_before_test": true
+  },
+  "calibration": {
+    "C0": {
+      "mean P(Sell)": 0.3054486142,
+      "actual Sell share": 0.2073476281,
+      "years within \u00b13 pp": 1,
+      "passes \u00a75.1": false,
+      "log_loss": 1.0297456159
+    },
+    "C1": {
+      "mean P(Sell)": 0.21729165,
+      "actual Sell share": 0.2073476281,
+      "years within \u00b13 pp": 4,
+      "passes \u00a75.1": false,
+      "log_loss": 1.0066159034
+    },
+    "C2": {
+      "mean P(Sell)": 0.2164457427,
+      "actual Sell share": 0.2073476281,
+      "years within \u00b13 pp": 4,
+      "passes \u00a75.1": false,
+      "log_loss": 1.0072956767
+    },
+    "C3": {
+      "mean P(Sell)": 0.2406329542,
+      "actual Sell share": 0.2073476281,
+      "years within \u00b13 pp": 3,
+      "passes \u00a75.1": false,
+      "log_loss": 1.0193790869
+    }
+  },
+  "development": {
+    "C0-L": {
+      "eligible": false,
+      "final_value": 182086.75,
+      "sharpe_excess": 0.467,
+      "max_drawdown": -0.2686,
+      "round_trips": 28,
+      "exposure": 0.68,
+      "total_fees": 9513.17
+    },
+    "C0-C": {
+      "eligible": false,
+      "final_value": 126989.43,
+      "sharpe_excess": 0.513,
+      "max_drawdown": -0.0469,
+      "round_trips": 7,
+      "exposure": 0.021,
+      "total_fees": 1567.59
+    },
+    "C1-L": {
+      "eligible": true,
+      "final_value": 260568.96,
+      "sharpe_excess": 0.603,
+      "max_drawdown": -0.3372,
+      "round_trips": 3,
+      "exposure": 0.989,
+      "total_fees": 928.01
+    },
+    "C1-C": {
+      "eligible": true,
+      "final_value": 126741.97,
+      "sharpe_excess": 0.185,
+      "max_drawdown": -0.3345,
+      "round_trips": 20,
+      "exposure": 0.628,
+      "total_fees": 5549.56
+    },
+    "C2-L": {
+      "eligible": true,
+      "final_value": 267578.27,
+      "sharpe_excess": 0.617,
+      "max_drawdown": -0.3372,
+      "round_trips": 4,
+      "exposure": 0.983,
+      "total_fees": 1423.82
+    },
+    "C2-C": {
+      "eligible": true,
+      "final_value": 125963.85,
+      "sharpe_excess": 0.181,
+      "max_drawdown": -0.3345,
+      "round_trips": 21,
+      "exposure": 0.628,
+      "total_fees": 5770.54
+    },
+    "C3-L": {
+      "eligible": true,
+      "final_value": 316843.58,
+      "sharpe_excess": 0.708,
+      "max_drawdown": -0.3372,
+      "round_trips": 1,
+      "exposure": 1.0,
+      "total_fees": 99.9
+    },
+    "C3-C": {
+      "eligible": true,
+      "final_value": 141640.68,
+      "sharpe_excess": 0.257,
+      "max_drawdown": -0.3372,
+      "round_trips": 20,
+      "exposure": 0.508,
+      "total_fees": 5330.54
+    }
+  },
+  "development_bh": {
+    "strategy": "Buy & Hold",
+    "final_value": 316843.58,
+    "total_return": 2.1684,
+    "cagr": 0.1223,
+    "ann_vol": 0.1737,
+    "sharpe_excess": 0.708,
+    "max_drawdown": -0.3372,
+    "round_trips": 1,
+    "exposure": 1.0,
+    "total_fees": 99.9
+  },
+  "results": {
+    "2023\u201324 test": {
+      "strategy": {
+        "strategy": "v3w C3-L",
+        "final_value": 156546.25,
+        "total_return": 0.5655,
+        "cagr": 0.2523,
+        "ann_vol": 0.1283,
+        "sharpe_excess": 1.43,
+        "max_drawdown": -0.0997,
+        "round_trips": 1,
+        "exposure": 1.0,
+        "total_fees": 99.9
+      },
+      "buy_and_hold": {
+        "strategy": "Buy & Hold",
+        "final_value": 156546.25,
+        "total_return": 0.5655,
+        "cagr": 0.2523,
+        "ann_vol": 0.1283,
+        "sharpe_excess": 1.43,
+        "max_drawdown": -0.0997,
+        "round_trips": 1,
+        "exposure": 1.0,
+        "total_fees": 99.9
+      },
+      "classification": {
+        "n": 496,
+        "accuracy": 0.4819,
+        "macro_f1": 0.3388,
+        "log_loss": 1.0215
+      },
+      "beats_random": null,
+      "er_min": -0.0011017343328928696,
+      "er_max": 0.006083812190948864
+    },
+    "2025\u201326 holdout": {
+      "strategy": {
+        "strategy": "v3w C3-L",
+        "final_value": 134409.74,
+        "total_return": 0.3441,
+        "cagr": 0.1823,
+        "ann_vol": 0.1694,
+        "sharpe_excess": 0.844,
+        "max_drawdown": -0.1876,
+        "round_trips": 1,
+        "exposure": 1.0,
+        "total_fees": 99.9
+      },
+      "buy_and_hold": {
+        "strategy": "Buy & Hold",
+        "final_value": 134409.74,
+        "total_return": 0.3441,
+        "cagr": 0.1823,
+        "ann_vol": 0.1694,
+        "sharpe_excess": 0.844,
+        "max_drawdown": -0.1876,
+        "round_trips": 1,
+        "exposure": 1.0,
+        "total_fees": 99.9
+      },
+      "classification": {
+        "n": 439,
+        "accuracy": 0.4989,
+        "macro_f1": 0.3619,
+        "log_loss": 1.0424
+      },
+      "beats_random": null,
+      "er_min": -0.0011230364331921427,
+      "er_max": 0.006892694528119729
+    }
+  }
+}

@@ -1,6 +1,8 @@
 """v3 (docs/v3_design_note.md): probability treatments C0-C3 for v2's frozen HGB, and the
 yearly walk-forward that produces out-of-sample class probabilities for each of them.
 
+The base model is v2's frozen HGB by default; the weekly rebuild (v3w) passes v2w's model.
+
 C0  balanced class weights, raw probabilities (v2 as is; reference only)
 C1  no class weights
 C2  balanced weights, then prior correction p_k ∝ p̃_k · π_k (π = the fit's training class shares)
@@ -40,25 +42,25 @@ def prior_correct(proba: pd.DataFrame, priors: dict) -> pd.DataFrame:
 class Candidate:
     """Fit on one training window, then predict calibrated class probabilities."""
 
-    def __init__(self, kind: str, params: dict):
+    def __init__(self, kind: str, params: dict, model: str = "HGB"):
         if kind not in CANDIDATES:
             raise ValueError(kind)
-        self.kind, self.params = kind, params
+        self.kind, self.params, self.model = kind, params, model
 
-    def _hgb(self, class_weight):
-        return make_pipeline("HGB", class_weight=class_weight).set_params(**self.params)
+    def _base(self, class_weight):
+        return make_pipeline(self.model, class_weight=class_weight).set_params(**self.params)
 
     def fit(self, X: pd.DataFrame, y: pd.Series):
         y = y.astype(int)
         self.priors_ = y.value_counts(normalize=True).reindex(config.CLASSES).to_dict()
         if self.kind == "C1":
-            self.model_ = self._hgb(None).fit(X, y)
+            self.model_ = self._base(None).fit(X, y)
         elif self.kind == "C3":
             self.model_ = CalibratedClassifierCV(
-                self._hgb("balanced"), method="sigmoid", cv=make_cv(gap=config.V2_GAP)
+                self._base("balanced"), method="sigmoid", cv=make_cv(gap=config.V2_GAP)
             ).fit(X, y)
         else:  # C0, C2
-            self.model_ = self._hgb("balanced").fit(X, y)
+            self.model_ = self._base("balanced").fit(X, y)
         return self
 
     def predict_proba(self, X: pd.DataFrame) -> pd.DataFrame:
@@ -73,7 +75,9 @@ def training_window(ds: pd.DataFrame, year: int) -> pd.DataFrame:
     return hist.dropna(subset=["label"]).iloc[: -config.V2_GAP]
 
 
-def walk_forward_proba(ds: pd.DataFrame, kind: str, years, params: dict) -> pd.DataFrame:
+def walk_forward_proba(
+    ds: pd.DataFrame, kind: str, years, params: dict, model: str = "HGB"
+) -> pd.DataFrame:
     """Out-of-sample probabilities for every day of `years`, refitting each January.
     Adds the fit's training class shares (prior_*) and class mean forward returns (mu_*),
     both from the same training rows, so E[r] can be formed without reading later data."""
@@ -83,7 +87,7 @@ def walk_forward_proba(ds: pd.DataFrame, kind: str, years, params: dict) -> pd.D
         days = ds.loc[f"{year}-01-01" : f"{year}-12-31"]
         if days.empty:
             continue
-        cand = Candidate(kind, params).fit(hist[FEATURE_COLS], hist["label"])
+        cand = Candidate(kind, params, model).fit(hist[FEATURE_COLS], hist["label"])
         p = cand.predict_proba(days[FEATURE_COLS])
         mu = hist["r_fwd"].groupby(hist["label"].astype(int)).mean()
         for k in config.CLASSES:
