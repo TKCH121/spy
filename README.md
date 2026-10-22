@@ -2,6 +2,8 @@
 
 Time-series 3-class classification (Buy / Hold / Sell) of SPY's next-5-day return. The emphasis is on **leakage-free validation** and a **realistic, cost-aware backtest**, not on profit.
 
+> **Credits and versions.** **v1** (everything at git tag [`v1`](../../tree/v1), and all of the results below) was built by **Peter Li**, originally in [TKCH121/module3-machine-learningPL](https://github.com/TKCH121/module3-machine-learningPL). Its git history is kept here unchanged. **v2** is the group's revision. It fixes a design flaw found when reviewing v1: the trading rule ignored P(Hold), which is where all of the classifier's skill was. v2 is in progress, and its design was fixed before any v2 code or results existed: see [docs/v2_design_note.md](docs/v2_design_note.md). Work items are listed in [docs/v2_issues.md](docs/v2_issues.md).
+
 > 中文摘要：本项目用严格滞后的技术指标预测 SPY 未来 5 日收益的 Buy/Hold/Sell 类别。按时间切分并设 gap，用 vectorbt 做含费用的回测，并与 Buy & Hold 比较。结论：模型的分类效果（macro-F1 0.41）优于所有朴素基线，但扣费后回测收益 +23.7%，远低于 Buy & Hold 的 +56.5%。详见 [outputs/report_CN.md](outputs/report_CN.md)。后续研究预先登记了 9 种策略（趋势、ML 择时、ML 波动率目标、杠杆版本），先在 2013–2022 滚动回测，再在全新的 2025–2026 数据上检验，扣费后没有一个跑赢 Buy & Hold，只是能明显降低回撤。详见 [outputs/research/research_report_CN.md](outputs/research/research_report_CN.md)。计划文档见 [docs/](docs/)。
 
 ## Results at a glance (sealed test set 2023–2024)
@@ -17,6 +19,20 @@ The model beats every naive classifier, but it cannot separate up-moves from dow
 **Follow-up research: can any strategy beat Buy & Hold?** Nine strategies were pre-registered (trend filter, ML direction/crash signals, ML and rule-based volatility targeting, levered versions). They were tested on a 2013–2022 walk-forward and then on fresh 2025-01 → 2026-10 data. **None beat Buy & Hold's return after costs.** The trend and volatility-targeting strategies reduce drawdowns substantially at similar Sharpe, but they do not earn more. See [outputs/research/research_report.md](outputs/research/research_report.md) ([中文](outputs/research/research_report_CN.md)).
 
 ![equity](outputs/figures/equity_vs_bh.png)
+
+## v2 (in progress)
+
+v2 keeps v1's data, features, ±1% classes, chronological splits, gaps and costs, and changes how predictions become trades and how performance is judged. The full design is in [docs/v2_design_note.md](docs/v2_design_note.md). In short:
+
+- **Expected-return rule:** E[r] = P(Buy)·μ_Buy + P(Hold)·μ_Hold + P(Sell)·μ_Sell. Every probability counts, and the rule trades only when E[r] clears the round-trip cost.
+- **Default position chosen on validation:** either stay long and exit on signals, or stay in cash and enter on signals.
+- **Execution-aligned label** (open t+1 → open t+6) as the primary target.
+- **Model and rule selected together** on validation after-cost Sharpe.
+- **Evidence beyond one test window:** a yearly walk-forward over 2013–2024, block-bootstrap confidence intervals, a random-timing benchmark with the same exposure, exit-by-exit attribution, and cash earning the T-bill rate.
+
+v1 files stay untouched. v2 goes in `notebooks/v2_*.ipynb`, `outputs/v2/` and new `src/` modules, behind the existing interfaces.
+
+**Workflow:** branch from `main`, open a pull request, and get one review. CI runs the look-ahead and split tests (`pytest`) on every pull request.
 
 ## Repository layout
 
