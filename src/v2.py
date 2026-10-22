@@ -54,15 +54,15 @@ def positions_from_er(er: pd.Series, default: str, hurdle: float = ROUND_TRIP) -
 # --- C7: T-bill cash rate ---------------------------------------------------------------
 
 
-def download_tbill_snapshot() -> Path:
-    """Save the 13-week T-bill yield (yfinance ^IRX, percent p.a.) as a dated snapshot."""
+def download_tbill_snapshot(end: str = config.END, path=None) -> Path:
+    """Save the 13-week T-bill yield (yfinance ^IRX, percent p.a.) as a snapshot.
+    `end` is exclusive; the default path is a dated file in data/raw/."""
     import yfinance as yf
 
-    df = yf.download("^IRX", start=config.START, end=config.END, auto_adjust=False,
-                     progress=False)
+    df = yf.download("^IRX", start=config.START, end=end, auto_adjust=False, progress=False)
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = df.columns.get_level_values(0)
-    path = config.RAW_DIR / f"irx_{pd.Timestamp.today():%Y%m%d}.csv"
+    path = path or config.RAW_DIR / f"irx_{pd.Timestamp.today():%Y%m%d}.csv"
     df[["Close"]].rename(columns={"Close": "IRX"}).rename_axis("Date").to_csv(path)
     return path
 
