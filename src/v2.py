@@ -69,7 +69,7 @@ def download_tbill_snapshot(end: str = config.END, path=None) -> Path:
 
 def load_tbill_daily(calendar: pd.DatetimeIndex, path=None) -> pd.Series:
     """Daily cash return on the SPY calendar: IRX(t-1) / 100 / 252 (known before day t)."""
-    path = path or sorted(config.RAW_DIR.glob("irx_*.csv"))[-1]
+    path = path or max(config.RAW_DIR.glob("irx_*.csv"))
     irx = pd.read_csv(path, index_col=0, parse_dates=True)["IRX"]
     return (irx.reindex(calendar.union(irx.index)).ffill().reindex(calendar)
             .shift(1).fillna(0.0) / 100 / 252)
@@ -196,10 +196,12 @@ def bootstrap_f1_diff(y, p_model, p_base, block: int = 20, n: int = 2000,
     rng = np.random.default_rng(seed)
     y, pm, pb = map(np.asarray, (y, p_model, p_base))
     out = []
+    def f1(idx, p):
+        return f1_score(y[idx], p[idx], labels=config.CLASSES, average="macro", zero_division=0)
+
     for _ in range(n):
         i = _block_indices(len(y), block, rng)
-        f = lambda p: f1_score(y[i], p[i], labels=config.CLASSES, average="macro", zero_division=0)
-        out.append(f(pm) - f(pb))
+        out.append(f1(i, pm) - f1(i, pb))
     return np.array(out)
 
 

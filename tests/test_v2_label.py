@@ -38,7 +38,7 @@ def test_v2_label_reads_only_open_t1_and_t6(synthetic_ohlcv):
     for offset in (-1, 0, 2, 3, 4, 5, 7):
         assert np.isclose(r_after_shock("Open", offset), base.loc[day])
     for col in ("Close", "High", "Low", "Volume"):
-        for offset in range(0, 8):
+        for offset in range(8):
             assert np.isclose(r_after_shock(col, offset), base.loc[day])
 
 

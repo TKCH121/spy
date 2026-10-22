@@ -4,6 +4,8 @@ The test segment is only returned when explicitly requested
 (include_test=True); this is used in exactly one place, after the
 configuration has been frozen (Gate G4)."""
 
+from itertools import pairwise
+
 import pandas as pd
 from sklearn.model_selection import TimeSeriesSplit
 
@@ -41,7 +43,7 @@ def assert_chronological(segs: dict, calendar: pd.Index, gap: int = config.GAP) 
     """Each segment's last sample sits at least `gap` trading days before the next
     segment starts, so its h-day label window ends before that segment begins."""
     names = list(segs)
-    for a, b in zip(names, names[1:]):
+    for a, b in pairwise(names):
         end_pos = calendar.get_loc(segs[a].index.max())
         start_pos = calendar.get_loc(segs[b].index.min())
         assert start_pos - end_pos > gap, f"{a} -> {b}: gap {start_pos - end_pos} <= {gap}"

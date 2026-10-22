@@ -204,7 +204,7 @@ def build_candidates(ds: pd.DataFrame, years) -> tuple[dict, pd.DataFrame]:
         "S4L Vol-target σ20 ×1.5": _vol_weight(sigma20, W_MAX_LEVERED),
         "S5L Vol-target ML ×1.5": _vol_weight(sigma_ml, W_MAX_LEVERED),
         "S6L Trend + Vol-target ML ×1.5": apply_band(
-            ((TARGET_VOL / sigma_ml).clip(0, W_MAX_LEVERED).round(1) * trend)),
+            (TARGET_VOL / sigma_ml).clip(0, W_MAX_LEVERED).round(1) * trend),
     }
     diag = pd.DataFrame({"sigma20": sigma20, "sigma_ml": sigma_ml,
                          "fvol20": ds.loc[days, "fvol20"], "drop_sig": drop_sig, "rf_diff": diff})

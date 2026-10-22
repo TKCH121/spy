@@ -12,7 +12,7 @@ from src import config
 # --- turning class probabilities into actions --------------------------------
 
 
-def apply_rule(proba: pd.DataFrame, margin: float = None) -> pd.Series:
+def apply_rule(proba: pd.DataFrame, margin: float | None = None) -> pd.Series:
     """proba columns = [-1, 0, 1].
     margin=None -> argmax class.
     margin=m    -> Buy if P(Buy)-P(Sell) > m, Sell if P(Sell)-P(Buy) > m, else Hold."""
@@ -90,7 +90,7 @@ def summarize(pf, name: str = "") -> dict:
         "sharpe": round(float(sharpe), 3),
         "max_drawdown": round(float(dd), 4),
         "calmar": round(float(cagr / abs(dd)), 3) if dd < 0 else np.nan,
-        "n_orders": int(len(orders)),
+        "n_orders": len(orders),
         "n_trades": int(pf.trades.count()),
         "exposure": round(float((pos_value > 0).mean()), 3),
         "total_fees": round(float(orders["Fees"].sum()) if len(orders) else 0.0, 2),

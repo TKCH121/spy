@@ -18,9 +18,9 @@ from src import config
 
 
 def classification_metrics(y_true, y_pred, proba=None, classes=config.CLASSES) -> dict:
-    p, r, f, s = precision_recall_fscore_support(y_true, y_pred, labels=classes, zero_division=0)
+    p, r, f, _support = precision_recall_fscore_support(y_true, y_pred, labels=classes, zero_division=0)
     out = {
-        "n": int(len(y_true)),
+        "n": len(y_true),
         "accuracy": accuracy_score(y_true, y_pred),
         "balanced_accuracy": balanced_accuracy_score(y_true, y_pred),
         "macro_f1": f1_score(y_true, y_pred, labels=classes, average="macro", zero_division=0),
