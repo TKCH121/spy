@@ -14,6 +14,7 @@ const PATHS = load("outputs/scorecard_paths.json");
 const W1 = load("outputs/weekly/v1/results.json");
 const W2 = load("outputs/weekly/v2/results.json");
 const W3 = load("outputs/weekly/v3/results.json");
+const EDA = load("outputs/eda_slides.json");
 const sc = (strategy, period) => SC.find((r) => r.strategy === strategy && r.period === period);
 const T = "2023–24 test", WF = "2013–24 walk-forward", HO = "2025–26 holdout";
 
@@ -122,6 +123,48 @@ text(s, [
   { text: "Buy → fully invested for the week · Sell → in cash for the week · Hold → keep the current position. Training uses every trading day’s 5-day outcome; decisions are made once a week." },
 ], { x: M, y: 4.7, w: CW, h: 0.9, fontSize: 15 });
 
+// ---------- 4. EDA: what the data shows ----------
+pres.addSection({ title: "Exploratory analysis" });
+s = content("EDA: size is predictable, direction is not", "Exploratory analysis");
+const pm = EDA.price_monthly;
+s.addChart(pres.charts.LINE, [{ name: "SPY", labels: pm.dates.map((d) => d.slice(0, 4)), values: pm.close }], Object.assign({
+  x: M, y: 1.4, w: 5.9, h: 3.4, chartColors: [HEX.dk1], lineSize: 2, lineDataSymbol: "none",
+  catAxisLabelFrequency: 36, valAxisLabelFormatCode: "$#,##0", valGridLine: { color: "E3E7EE", size: 0.75 }, catGridLine: { style: "none" },
+  showLegend: false, showTitle: true, title: "SPY month-end price, 2005–2024 (dividend-adjusted)",
+}, chartText));
+s.addChart(pres.charts.BAR, [
+  { name: "Direction: daily return", labels: EDA.acf_returns.map((_, i) => String(i + 1)), values: EDA.acf_returns },
+  { name: "Size: absolute daily return", labels: EDA.acf_abs_returns.map((_, i) => String(i + 1)), values: EDA.acf_abs_returns },
+], Object.assign({
+  x: 6.7, y: 1.4, w: 6.03, h: 3.4, barDir: "col", barGrouping: "clustered", chartColors: [HEX.accent2, HEX.accent1],
+  valAxisMinVal: -0.2, valAxisMaxVal: 0.5, valAxisMajorUnit: 0.1, valAxisLabelFormatCode: "0.0",
+  valGridLine: { color: "E3E7EE", size: 0.75 }, catGridLine: { style: "none" },
+  showLegend: true, legendPos: "t", legendFontSize: 11, legendFontFace: "+mn-lt", legendColor: HEX.dk2,
+  showTitle: true, title: "Correlation with the same measure 1–10 days earlier (autocorrelation)",
+}, chartText));
+const ar = EDA.acf_returns, aa = EDA.acf_abs_returns;
+[["Direction has no memory", `Today’s return barely predicts the next days’: correlations ${Math.min(...ar).toFixed(2)} to +${Math.max(...ar).toFixed(2)}.`],
+ ["Size has memory", `Large moves cluster: correlation ${Math.min(...aa).toFixed(2)}–${Math.max(...aa).toFixed(2)} with the next days’ size.`],
+ ["Extreme days are common", `${EDA.days_beyond_3sd} days beyond 3 standard deviations vs about ${EDA.days_expected_beyond_3sd_if_normal} if returns were normal.`],
+].forEach(([t, b], i) => card(s, M + i * 4.1, 4.95, 3.93, 1.55, t, b, { bodySize: 13, titleSize: 15, fill: i === 0 ? "FBEDE4" : C.background2 }));
+
+// ---------- 5. EDA: class balance over time ----------
+s = content("EDA: the class mix shifts year to year", "Exploratory analysis");
+const cy = EDA.class_share_by_year;
+s.addChart(pres.charts.BAR, [
+  { name: "Sell (< −1%)", labels: cy.years.map(String), values: cy.Sell.map((v) => Math.round(1000 * v) / 10) },
+  { name: "Hold", labels: cy.years.map(String), values: cy.Hold.map((v) => Math.round(1000 * v) / 10) },
+  { name: "Buy (> +1%)", labels: cy.years.map(String), values: cy.Buy.map((v) => Math.round(1000 * v) / 10) },
+], Object.assign({
+  x: M, y: 1.4, w: 8.3, h: 5.0, barDir: "col", barGrouping: "percentStacked", chartColors: [HEX.accent2, HEX.accent3, HEX.accent1],
+  valAxisLabelFormatCode: "0%", valGridLine: { color: "E3E7EE", size: 0.75 }, catGridLine: { style: "none" },
+  showLegend: true, legendPos: "t", legendFontSize: 12, legendFontFace: "+mn-lt", legendColor: HEX.dk2,
+  showTitle: true, title: "Share of 5-day outcomes in each class, by year",
+}, chartText));
+const sellAt = (y) => pct(cy.Sell[cy.years.indexOf(y)], 0);
+card(s, 9.1, 1.5, 3.63, 2.3, "Imbalanced", "Sell is the minority class in almost every year, about one week in five on average.", { bodySize: 13 });
+card(s, 9.1, 4.0, 3.63, 2.4, "Unstable", `Sell weeks were ${sellAt(2017)} of 2017 and ${sellAt(2022)} of 2022. A model trained on one period meets a different mix in the next.`, { bodySize: 13, fill: "FBEDE4" });
+
 // ---------- 4. features and target ----------
 pres.addSection({ title: S2 });
 s = content("Features and target", S2);
@@ -140,7 +183,7 @@ text(s, "Class mix, training data 2010–2020", { x: 7.4, y: 1.5, w: 5.3, h: 0.3
   s.addShape(pres.shapes.RECTANGLE, { x: 8.2, y: y + 0.05, w: 4.0 * v / 0.45, h: 0.35, fill: { color: col }, line: { color: col } });
   text(s, pct(v, 0), { x: 8.3 + 4.0 * v / 0.45, y, w: 0.8, h: 0.45, fontSize: 14, valign: "middle" });
 });
-card(s, 7.4, 4.0, 5.33, 2.3, "Class imbalance", "Sell weeks are the minority. Class weights were used (SMOTE and no weighting were tested and scored lower). This improves recall of the minority class but inflates its predicted probability — see slide 12.", { bodySize: 13 });
+card(s, 7.4, 4.0, 5.33, 2.3, "Class imbalance", "Sell weeks are the minority. Class weights were used (SMOTE and no weighting were tested and scored lower). This improves recall of the minority class but inflates its predicted probability — see slide 14.", { bodySize: 13 });
 note(s, "All features are strictly lagged; tests confirm that changing future prices never changes a past feature.", 4.75);
 
 // ---------- 5. validation design ----------
@@ -337,5 +380,23 @@ cm.forEach((row, i) => {
   });
 });
 card(s, 8.9, 1.5, 3.83, 3.0, "Reading", "Hold weeks are recognised (62% recall). Of 92 Sell weeks, 39 were predicted Buy; of 198 Buy weeks, 56 were predicted Sell.", { bodySize: 13 });
+
+s = content("Appendix C · Feature correlations, training data 2010–2020", SA);
+const fc = EDA.feature_corr, nF = fc.features.length, cell = 0.3, hx = M + 2.0, hy = 1.75;
+const blend = (hexc, t) => {
+  const c = [0, 2, 4].map((k) => parseInt(hexc.slice(k, k + 2), 16));
+  return c.map((v) => Math.round(255 + (v - 255) * t).toString(16).padStart(2, "0")).join("").toUpperCase();
+};
+fc.features.forEach((f, i) => {
+  text(s, `${i + 1}  ${f}`, { x: M, y: hy + i * cell, w: 1.9, h: cell, fontSize: 10, valign: "middle" });
+  text(s, String(i + 1), { x: hx + i * cell, y: hy - 0.3, w: cell, h: 0.28, fontSize: 10, align: "center", valign: "bottom" });
+  fc.matrix[i].forEach((v, j) => {
+    const fill = v >= 0 ? blend("C8571B", Math.min(1, v)) : blend("2F5D9E", Math.min(1, -v));
+    s.addShape(pres.shapes.RECTANGLE, { x: hx + j * cell, y: hy + i * cell, w: cell, h: cell, fill: { color: fill }, line: { color: "FFFFFF", width: 0.5 } });
+  });
+});
+note(s, "Orange = positive, blue = negative correlation; darker = stronger.", hy + nF * cell + 0.1);
+card(s, 7.6, 1.5, 5.13, 2.6, "Overlapping indicators", `${fc["pairs_above_0.8"]} feature pairs have a correlation above 0.8 in absolute value — for example 10-day return with price vs its 20-day average (0.91), RSI with Bollinger %B (0.90), and the three volatility measures (up to 0.96).`, { bodySize: 13 });
+card(s, 7.6, 4.3, 5.13, 2.1, "Effect on the models", "v1 tested a compact 8-feature set to reduce this redundancy; it did not improve validation results, so all 15 features were kept.", { bodySize: 13 });
 
 pres.writeFile({ fileName: OUT }).then(async () => { await applyTheme(OUT, THEME); console.log("wrote", OUT, pres.slides.length, "slides"); });

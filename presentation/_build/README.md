@@ -6,12 +6,17 @@
 
 - `outputs/scorecard.json` and `outputs/scorecard_paths.json` (from `notebooks/scorecard.ipynb`)
 - `outputs/weekly/v1/`, `v2/`, `v3/results.json` (from `notebooks/weekly_v1.ipynb` … `weekly_v3.ipynb`)
+- `outputs/eda_slides.json` (from `presentation/_build/eda_data.py`: price, autocorrelations, class mix by year, feature correlations; same data and definitions as `notebooks/01_eda.ipynb`)
 
-## Command
+## Commands
 
 Node and `pptxgenjs` are needed (`npm install pptxgenjs`).
 
 The script also calls a theme helper (`apply_theme.js`, from the PowerPoint skill used to build this deck) through the `PPTX_SKILL` environment variable. Without it, the slide colours fall back to Office's default palette. In that case, edit the `.pptx` directly in PowerPoint instead.
+
+```bash
+python presentation/_build/eda_data.py
+```
 
 ```bash
 node presentation/_build/build_presentation.js presentation/SPY_Model_Presentation.pptx .
