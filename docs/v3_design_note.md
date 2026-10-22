@@ -117,4 +117,16 @@ From the first trading day after the freeze, the frozen pick's signal is compute
 
 ## Deviations
 
-_None yet. Add dated entries here: what changed, why, and whether results had been seen._
+_Add dated entries here: what changed, why, and whether results had been seen. The SHA-256 in `docs/v3_design_note.sha256` is that of the original note (commit `3428d83`); entries below are the only changes since._
+
+- **2026-10-22 — The blind paper-trade window (§5.6) starts on 2026-10-13, not at the freeze date.**
+  - **What changes:** §5.6's start moves to 2026-10-13, the first trading day after the last data any part of this project has analysed (the holdout snapshot ends 2026-10-12). Once the configuration is frozen, signals for 2026-10-13 up to the freeze date are computed retrospectively. Each day's signal still uses only data up to that day's close, and the trade still fills at the next open.
+  - **What stays the same:** after the freeze, signals are logged each evening as planned. The 2025-01-02 → 2026-10-12 period remains the **primary holdout** (§5.5).
+  - **Why:** to add the few unseen trading days that already exist to the only blind test.
+  - **What had been seen:**
+    - §5.1 calibration results existed (`outputs/v3/calibration_report.md`). They use 2013–2022 probabilities only.
+    - No trading result for any v3 candidate existed.
+    - No SPY or T-bill price after 2026-10-12 had been downloaded or analysed by the project.
+    - Group members may have followed general market news since 2026-10-13. Anyone who did must say so in the write-up.
+  - **Limits:** 2026-10-13 → 2026-10-21 is about 7 trading days, of which only about one has a known 5-day outcome. These days are part of the blind window, not a test on their own.
+  - **Condition:** nobody on the project analyses SPY data after 2026-10-12 before the freeze.
