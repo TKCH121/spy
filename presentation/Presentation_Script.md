@@ -34,8 +34,10 @@ Six points to make, in order. Each lists the slides it covers and roughly how lo
   - Their Sharpe ratio was lower: 0.76 for v1 vs 1.43.
   - v1 beat only 27% of 1,000 random-timing strategies with the same exposure, so its timing was no better than chance.
 - **Robustness (slide 10):**
-  - Over 12 years, v2 cut the worst drawdown to under 5% but was invested only 2% of the time: 2.9% a year vs 14.4%.
-  - On the 2025–26 holdout, v3 again matched buy-and-hold.
+  - **What the walk-forward is:** instead of one two-year test, we retrain every January from 2013 to 2024 and trade the following year. That's twelve tests across calm years, the 2020 crash and the 2022 bear market.
+  - **Results:** $100,000 became $499,271 with buy-and-hold, $164,406 with v1 and $140,013 with v2. v3 never sold, so it matched buy-and-hold.
+  - **Risk:** the lower drawdowns came only from time out of the market. v2 was invested just 2% of the time.
+  - **Holdout:** on a later period never used for any choice (January 2025 to October 2026), v3 again matched buy-and-hold.
 
 ## 4. Why (slides 11–12 · ~1.5 min)
 

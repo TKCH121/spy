@@ -233,16 +233,22 @@ card(s, M + 8.2, 4.75, 3.93, 1.65, "Timing not better than chance", `v1 beat ${p
 
 // ---------- 10. robustness ----------
 s = content("Beyond one test period", S3);
-const wb = sc("Buy & Hold", WF), w2 = sc("v2w", WF), w3 = sc("v3w", WF), hb = sc("Buy & Hold", HO);
+const wb = sc("Buy & Hold", WF), w1 = sc("v1w", WF), w2 = sc("v2w", WF), hb = sc("Buy & Hold", HO);
+const wfRow = (k, r) => [k, usd(r.final_value), pct(r.cagr), pct(r.max_drawdown), r.sharpe.toFixed(2), pct(r.time_invested, 0)];
+text(s, [
+  { text: "12-year walk-forward, 2013–2024. ", options: { bold: true, color: C.text1 } },
+  { text: "Retrain every January on all earlier data, trade the following year, repeat; $100,000 chained across the 12 years." },
+], { x: M, y: 1.35, w: CW, h: 0.5, fontSize: 14 });
 s.addTable([
-  [hdr("Period"), hdr("Strategy"), hdr("Final value"), hdr("Annual return"), hdr("Max drawdown"), hdr("Sharpe"), hdr("Time invested")],
-  ["2013–2024 walk-forward", "Buy & Hold", usd(wb.final_value), pct(wb.cagr), pct(wb.max_drawdown), wb.sharpe.toFixed(2), "100%"],
-  ["", "v2 weekly", usd(w2.final_value), pct(w2.cagr), pct(w2.max_drawdown), w2.sharpe.toFixed(2), pct(w2.time_invested, 0)],
-  ["", "v3 weekly", usd(w3.final_value), pct(w3.cagr), pct(w3.max_drawdown), w3.sharpe.toFixed(2), "100%"],
-  ["2025–26 holdout", "Buy & Hold = v3 weekly", usd(hb.final_value), pct(hb.cagr), pct(hb.max_drawdown), hb.sharpe.toFixed(2), "100%"],
-], Object.assign({ x: M, y: 1.5, w: CW, colW: [2.6, 2.6, 1.6, 1.6, 1.6, 1.0, 1.13], fontSize: 14, rowH: 0.52, margin: [0.05, 0.1, 0.05, 0.1] }, TABLE));
-card(s, M, 4.4, 5.98, 2.0, "v2: low risk, low return", `Invested only ${pct(w2.time_invested, 0)} of the time over 12 years. Its few trades were well timed, but it earned ${pct(w2.cagr)} a year against ${pct(wb.cagr)}.`, { bodySize: 14 });
-card(s, M + 6.15, 4.4, 5.98, 2.0, "v3: no trades", "With calibrated probabilities, the expected loss never exceeded the cost of trading, so it held throughout every period.", { bodySize: 14, fill: "FBEDE4" });
+  [hdr("Strategy (weekly decisions)"), hdr("Final value"), hdr("Annual return"), hdr("Max drawdown"), hdr("Sharpe"), hdr("Time invested")],
+  wfRow("Buy & Hold", wb), wfRow("v1 · random forest", w1), wfRow("v2 · logistic regression", w2),
+  ["v3 · never sells — identical to buy-and-hold", "", "", "", "", ""],
+], Object.assign({ x: M, y: 1.9, w: CW, colW: [3.93, 1.7, 1.7, 1.7, 1.4, 1.7], fontSize: 14, rowH: 0.45, margin: [0.04, 0.1, 0.04, 0.1] }, TABLE));
+text(s, [
+  { text: "Holdout, Jan 2025 – Oct 2026. ", options: { bold: true, color: C.text1 } },
+  { text: `A later period never used for any choice. v3 never sold and matched buy-and-hold: ${usd(hb.final_value)}, ${pct(hb.cagr)} a year, max drawdown ${pct(hb.max_drawdown)}.` },
+], { x: M, y: 4.3, w: CW, h: 0.7, fontSize: 14 });
+card(s, M, 5.05, CW, 1.45, "Takeaway", `Across 12 years no version beat buy-and-hold. Lower drawdowns came only from time out of the market, at a large cost in return (v1 ${pct(w1.cagr)} and v2 ${pct(w2.cagr)} a year vs ${pct(wb.cagr)}).`, { bodySize: 14, fill: "FBEDE4" });
 
 // ---------- 11. why ----------
 pres.addSection({ title: S4 });

@@ -33,20 +33,22 @@ The calibration check for v3w's new base model failed the pre-set rule again: th
 
 v1w as built (cash at 0%) made $121,900.
 
-**Walk-forward 2013–2024 and holdout 2025-01 → 2026-10**
+**12-year walk-forward, 2013–2024.** A repeated test across many market conditions (the 2018 drop, the 2020 crash, the 2022 bear market). Every January the model is retrained on all earlier data, then trades the following year with its frozen rule; the 12 years are chained from $100,000. This is a check only: nothing was chosen from it.
 
-| Strategy | $100,000 became | Annual return | Max drawdown | Sharpe | Time invested |
+| Strategy (weekly decisions) | Final value | Annual return | Max drawdown | Sharpe | Time invested |
 |---|---|---|---|---|---|
-| Buy & Hold, 2013–24 | **$499,271** | **14.4%** | −33.7% | **0.80** | 100% |
-| v2w, 2013–24 | $140,013 | 2.9% | **−4.7%** | 0.46 | 2% |
-| v3w, 2013–24 | $499,271 | 14.4% | −33.7% | 0.80 | 100% |
-| Buy & Hold = v3w, 2025–26 holdout | $134,410 | 18.2% | −18.8% | 0.84 | 100% |
+| **Buy & Hold** | **$499,271** | **14.4%** | −33.7% | **0.80** | 100% |
+| v1w · random forest | $164,406 | 4.2% | −23.9% | 0.28 | 62% |
+| v2w · logistic regression, default cash | $140,013 | 2.9% | −4.7% | 0.46 | 2% |
+| v3w · never sells, so identical to Buy & Hold | $499,271 | 14.4% | −33.7% | 0.80 | 100% |
+
+**Holdout, January 2025 – October 2026.** A later period never used for any choice. Only v3 was planned for it. v3w never sold, so it matched Buy & Hold: **$134,410** (18.2% a year, max drawdown −18.8%, Sharpe 0.84).
 
 ## What it shows
 
 1. **No weekly strategy beat Buy & Hold** on return, Sharpe or Calmar in any period. v3w matched it only because it never sold.
 2. **Choosing on two years of validation is fragile.** v1w and v2w both looked better than Buy & Hold on 2021–22, which included the 2022 fall, and both trailed badly on 2023–24's rally. v2w's pick, "stay in cash unless the model is confident", hardly ever invested afterwards.
-3. **Lower risk came only from being out of the market.** v2w's worst fall over 12 years was −4.7%, but it was invested 2% of the time. Its few trades were well timed (it beat all 200 random paths with the same exposure), yet it earned 2.9% a year against 14.4%. v1w's volatility was lower than Buy & Hold's, but its worst fall was the same.
+3. **Lower risk came only from being out of the market.** v2w's worst fall over 12 years was −4.7%, but it was invested 2% of the time. Its few trades were well timed (it beat all 200 random paths with the same exposure), yet it earned 2.9% a year against 14.4%. v1w's volatility was lower than Buy & Hold's, but on 2023–24 its worst fall was the same. Over 12 years, v1w's worst fall was smaller (−23.9% vs −33.7%), but it earned 4.2% a year, its Sharpe was 0.28 vs 0.80, and it beat only 6% of random-timing paths.
 4. **Weekly vs daily makes little difference** to the conclusion. The original daily versions made $129,069 (v1), $121,812 (v2) and $156,546 (v3) on the same basis. Deciding weekly roughly halves trading costs, but the model's weakness is in what it predicts (direction), not in how often it acts.
 
 ## Disclosure

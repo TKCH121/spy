@@ -23,14 +23,16 @@ $100,000; 0.10% fee + 0.05% slippage per side; cash earns the 13-week T-bill rat
 | v2w · logistic regression, default cash | $110,453 | 5.1% | 0.0% | 0.0% | — (all cash) | 0 | 0% |
 | v3w · calibrated logistic regression | $156,546 | 25.2% | 12.8% | −10.0% | 1.43 | 1 (never sells) | 100% |
 
-**Walk-forward 2013–2024 (yearly refits) and holdout 2025-01 → 2026-10**
+**12-year walk-forward, 2013–2024.** A repeated test across many market conditions (the 2018 drop, the 2020 crash, the 2022 bear market). Every January the model is retrained on all earlier data, then trades the following year with its frozen rule; the 12 years are chained from $100,000. This is a check only: nothing was chosen from it.
 
-| Strategy | Final value | Annual return | Max drawdown | Sharpe | Time invested |
+| Strategy (weekly decisions) | Final value | Annual return | Max drawdown | Sharpe | Time invested |
 |---|---|---|---|---|---|
-| Buy & Hold, 2013–24 | **$499,271** | **14.4%** | −33.7% | **0.80** | 100% |
-| v2w, 2013–24 | $140,013 | 2.9% | −4.7% | 0.46 | 2% |
-| v3w, 2013–24 | $499,271 | 14.4% | −33.7% | 0.80 | 100% |
-| Buy & Hold = v3w, 2025–26 holdout | $134,410 | 18.2% | −18.8% | 0.84 | 100% |
+| **Buy & Hold** | **$499,271** | **14.4%** | −33.7% | **0.80** | 100% |
+| v1w · random forest | $164,406 | 4.2% | −23.9% | 0.28 | 62% |
+| v2w · logistic regression, default cash | $140,013 | 2.9% | −4.7% | 0.46 | 2% |
+| v3w · never sells, so identical to Buy & Hold | $499,271 | 14.4% | −33.7% | 0.80 | 100% |
+
+**Holdout, January 2025 – October 2026.** A later period never used for any choice. Only v3 was planned for it. v3w never sold, so it matched Buy & Hold: **$134,410** (18.2% a year, max drawdown −18.8%, Sharpe 0.84).
 
 **Daily decisions, for comparison** (the original v1–v3, same basis, 2023–24): v1 $129,069, v2 $121,812, v3 $156,546 (never sells). The schedule changes costs, not the conclusion.
 

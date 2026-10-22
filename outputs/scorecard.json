@@ -180,6 +180,36 @@
     "beats_random": null
   },
   {
+    "period": "2013\u201324 walk-forward",
+    "strategy": "v1w",
+    "schedule": "weekly",
+    "final_value": 164405.98,
+    "cagr": 0.0424,
+    "ann_vol": 0.1272,
+    "max_drawdown": -0.2391,
+    "sharpe": 0.275,
+    "calmar": 0.18,
+    "round_trips": 64,
+    "costs": 16608.54,
+    "time_invested": 0.624,
+    "beats_random": 0.055
+  },
+  {
+    "period": "2013\u201324 walk-forward",
+    "strategy": "v1",
+    "schedule": "daily",
+    "final_value": 212585.32,
+    "cagr": 0.065,
+    "ann_vol": 0.1177,
+    "max_drawdown": -0.1612,
+    "sharpe": 0.469,
+    "calmar": 0.4,
+    "round_trips": 88,
+    "costs": 23740.18,
+    "time_invested": 0.6,
+    "beats_random": 0.46
+  },
+  {
     "period": "2025\u201326 holdout",
     "strategy": "Buy & Hold",
     "schedule": "\u2014",
