@@ -8,6 +8,9 @@ const OUT = process.argv[2];
 const P = JSON.parse(fs.readFileSync(process.argv[3], "utf8"));
 const R = JSON.parse(fs.readFileSync(process.argv[4], "utf8")); // outputs/v2/results.json
 const WK = JSON.parse(fs.readFileSync(process.argv[6], "utf8")); // outputs/weekly/results.json
+const SC = JSON.parse(fs.readFileSync(process.argv[7], "utf8")); // outputs/scorecard.json
+const sc = (strategy, period, sched) => SC.find((r) => r.strategy.startsWith(strategy) && r.period === period && r.schedule === sched);
+const pct1 = (x) => (100 * x).toFixed(1) + "%";
 const wk = (v, period, sched) => WK.find((r) => r.version === v && r.period === period && r.schedule === sched);
 const V2T = R.test[0], BHT = R.test[1], EV = R.evidence;
 const WF = R.walk_forward[0], WFB = R.walk_forward[1];
@@ -127,7 +130,7 @@ text(s, "Throughout: no look-ahead, checked by 50 automated tests. Code: github.
 // ---------- 2. two options ----------
 s = content("The question in one picture", S1);
 card(s, M, 1.55, 5.8, 3.5, "Option A · Buy and wait", "On 3 January 2023, put $100,000 into the US stock market and do nothing for two years.\n\nThis is the yardstick, called “Buy & Hold”.", { bodySize: 17, titleSize: 22 });
-card(s, M + 6.33, 1.55, 5.8, 3.5, "Option B · Follow the model", "Every evening, a model predicts the best action for the next 5 trading days: Buy, Hold or Sell. We trade on it the next morning.\n\nEvery trade costs a small fee.", { bodySize: 17, titleSize: 22, fill: "FBEDE4" });
+card(s, M + 6.33, 1.55, 5.8, 3.5, "Option B · Follow the model", "After the market closes, a model predicts the best action for the next 5 trading days: Buy, Hold or Sell. We trade on it at the next open.\n\nEvery trade costs a small fee.", { bodySize: 17, titleSize: 22, fill: "FBEDE4" });
 text(s, "Which one ends 2024 with more money?", { x: M, y: 5.45, w: CW, h: 0.7, fontSize: 28, bold: true, color: C.accent1, align: "center", fontFace: THEME.headFontFace });
 
 // ---------- 3. glossary ----------
@@ -156,7 +159,8 @@ s.addChart(pres.charts.BAR, [{ name: "Money at end of 2024", labels: ["Buy & Hol
   showTitle: true, title: "$100,000 invested on 3 Jan 2023 → value on 31 Dec 2024",
 }, chartText, { catAxisLabelFontSize: 16, dataLabelFontSize: 18 }));
 stat(s, 7.7, 1.6, 5.0, "+" + usd(T.bh_final - 100000), "Buy & Hold profit — bought once, paid $100 in costs", C.text1);
-stat(s, 7.7, 3.25, 5.0, "+" + usd(T.model_final - 100000), "Model profit — 15 round trips, paid " + usd(T.model_fees) + " in costs");
+stat(s, 7.7, 3.25, 5.0, "+" + usd(T.model_final - 100000), "Model profit — 15 round trips, " + usd(T.model_fees) + " in costs, cash earning nothing (as v1 was built)");
+text(s, "Worst fall: model −9.6%, Buy & Hold −10.0%. The time in cash bought no safety.", { x: M, y: 6.4, w: 6.6, h: 0.5, fontSize: 13, italic: true, color: C.accent3 });
 stat(s, 7.7, 4.9, 5.0, usd(gap), "Less money than simply waiting", C.accent2);
 
 // ---------- 5. journey ----------
@@ -178,7 +182,7 @@ card(s, 9.5, 4.05, 3.23, 2.35, "Time in cash", (T.days - T.days_in) + " of " + T
 
 // ---------- 6. pipeline ----------
 pres.addSection({ title: S2 });
-s = content("How the model makes a decision, every evening", S2);
+s = content("How the model makes a decision", S2);
 const steps = [
   ["Look", "Measure 15 things about recent prices and trading activity"],
   ["Predict", "The action for the next 5 days: Buy (> +1%), Sell (< −1%) or Hold"],
@@ -346,14 +350,15 @@ const fixes = [
   ["Measure what we can trade", "Predict from next morning’s price, when the trade actually happens, not today’s close."],
   ["Choose by money, not score", "Pick the model and the rule together, by money made on the practice exam after costs."],
   ["Test on 12 years, not 2", "Re-train each year and test 2013–2024 one year at a time, plus the same final exam."],
+  ["Cash earns interest", "Money out of the market earns the Treasury-bill rate (about 5% a year in 2023–24). v1 assumed it earned nothing."],
 ];
 fixes.forEach(([t, b], i) => {
-  const y = 1.5 + i * 1.02;
-  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: M, y, w: CW, h: 0.92, rectRadius: 0.1, fill: { color: C.background2 }, line: { color: C.background2 } });
-  s.addShape(pres.shapes.OVAL, { x: M + 0.22, y: y + 0.22, w: 0.48, h: 0.48, fill: { color: C.accent1 }, line: { color: C.accent1 } });
-  text(s, String(i + 1), { x: M + 0.22, y: y + 0.22, w: 0.48, h: 0.48, fontSize: 16, bold: true, color: C.background1, align: "center", valign: "middle" });
-  text(s, t, { x: M + 0.9, y, w: 3.5, h: 0.92, fontSize: 17, bold: true, color: C.text1, fontFace: THEME.headFontFace, valign: "middle" });
-  text(s, b, { x: M + 4.5, y, w: CW - 4.75, h: 0.92, fontSize: 15, valign: "middle" });
+  const y = 1.45 + i * 0.86;
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: M, y, w: CW, h: 0.78, rectRadius: 0.1, fill: { color: C.background2 }, line: { color: C.background2 } });
+  s.addShape(pres.shapes.OVAL, { x: M + 0.22, y: y + 0.15, w: 0.48, h: 0.48, fill: { color: C.accent1 }, line: { color: C.accent1 } });
+  text(s, String(i + 1), { x: M + 0.22, y: y + 0.15, w: 0.48, h: 0.48, fontSize: 16, bold: true, color: C.background1, align: "center", valign: "middle" });
+  text(s, t, { x: M + 0.9, y, w: 3.5, h: 0.78, fontSize: 17, bold: true, color: C.text1, fontFace: THEME.headFontFace, valign: "middle" });
+  text(s, b, { x: M + 4.5, y, w: CW - 4.75, h: 0.78, fontSize: 15, valign: "middle" });
 });
 
 // ---------- 17. proof ----------
@@ -366,11 +371,11 @@ card(s, M + 6.6, 4.9, 5.53, 1.55, "Trade-by-trade receipt", "For every exit: how
 // ---------- 18. v2 results ----------
 s = content("Version 2 results: $100,000, 2023–2024", S4);
 const rrows = [
-  [hdr("Strategy"), hdr("$100,000 became"), hdr("Profit"), hdr("Time in the market")],
-  ["Buy & Hold", usd(BHT.final_value), "+" + usd(BHT.final_value - 100000), "100%"],
-  ["Version 1 model", usd(T.model_final), "+" + usd(T.model_final - 100000), Math.round(100 * T.days_in / T.days) + "%"],
-  ["Version 2 model", usd(V2T.final_value), "+" + usd(V2T.final_value - 100000), Math.round(100 * V2T.exposure) + "%"],
-  ["Typical random trader (v2’s time in market)", usd(EV.random_median_final), "+" + usd(EV.random_median_final - 100000), Math.round(100 * V2T.exposure) + "%"],
+  [hdr("Strategy (cash earns interest)"), hdr("$100,000 became"), hdr("Worst fall"), hdr("Time in the market")],
+  ["Buy & Hold", usd(BHT.final_value), pct1(BHT.max_drawdown), "100%"],
+  ["Version 1 model", usd(sc("v1", "2023–24 test", "daily").final_value), pct1(sc("v1", "2023–24 test", "daily").max_drawdown), Math.round(100 * sc("v1", "2023–24 test", "daily").time_invested) + "%"],
+  ["Version 2 model", usd(V2T.final_value), pct1(V2T.max_drawdown), Math.round(100 * V2T.exposure) + "%"],
+  ["Typical random trader (v2’s time in market)", usd(EV.random_median_final), "—", Math.round(100 * V2T.exposure) + "%"],
 ];
 s.addTable(rrows, Object.assign({ x: M, y: 1.5, w: 7.9, colW: [3.3, 1.75, 1.45, 1.4], fontSize: 15, rowH: 0.62, margin: [0.06, 0.1, 0.06, 0.1] }, TABLE));
 s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 8.75, y: 1.5, w: 3.98, h: 3.1, rectRadius: 0.12, fill: { color: "FBEDE4" }, line: { color: "FBEDE4" } });
@@ -458,12 +463,13 @@ text(s, "A live paper-trade of the frozen rule runs from 13 Oct 2026.", { x: M, 
 // ---------- model and accuracy across versions ----------
 s = content("Which model, and how accurate?", S4b);
 const arows = [
-  [hdr("Version"), hdr("Model"), hdr("Chosen by"), hdr("Accuracy"), hdr("Macro-F1"), hdr("$100,000 on 2023–24")],
-  ["v1", "Random forest", "Best prediction score", "44.9%", "0.41", usd(T.model_final)],
+  [hdr("Version"), hdr("Model"), hdr("Chosen by"), hdr("Accuracy"), hdr("Macro-F1"), hdr("$100,000 on 2023–24*")],
+  ["v1", "Random forest", "Best prediction score", "44.9%", "0.41", usd(sc("v1", "2023–24 test", "daily").final_value)],
   ["v2", "Gradient boosting", "Most money on the practice exam", "40.9%", "0.38", usd(V2T.final_value)],
   ["v3", "Gradient boosting + corrected odds", "Pre-set rule, 2013–2022", "48.4%", "0.35", usd(BHT.final_value) + " (never trades)"],
 ];
 s.addTable(arows, Object.assign({ x: M, y: 1.5, w: CW, colW: [1.1, 3.1, 2.75, 1.35, 1.35, 2.48], fontSize: 15, rowH: 0.62, margin: [0.06, 0.1, 0.06, 0.1] }, TABLE));
+text(s, "* Cash earning interest for every version.", { x: M, y: 3.98, w: CW, h: 0.25, fontSize: 12, italic: true, color: C.accent3 });
 card(s, M, 4.25, 3.93, 2.2, "Why the model changed", "v2 picked the model by money made, not prediction score, so gradient boosting replaced the random forest.", { bodySize: 14, titleSize: 17 });
 card(s, M + 4.1, 4.25, 3.93, 2.2, "Highest accuracy ≠ best", "v3’s corrected odds call the common flat weeks more often: accuracy up, macro-F1 down.", { bodySize: 14, titleSize: 17, fill: "FBEDE4" });
 card(s, M + 8.2, 4.25, 3.93, 2.2, "No sign of a leak", "41–50% across three classes. The brief calls 35–40% normal and warns that 80% means a leak.", { bodySize: 14, titleSize: 17 });
@@ -472,7 +478,7 @@ card(s, M + 8.2, 4.25, 3.93, 2.2, "No sign of a leak", "41–50% across three cl
 s = content("One decision a week: the brief’s literal reading", S4b);
 const T24 = "2023–24 test";
 const wrows = [
-  [hdr("$100,000, 2023–24"), hdr("Decides every day"), hdr("Decides each Friday"), hdr("Buy & Hold")],
+  [hdr("$100,000, 2023–24*"), hdr("Decides every day"), hdr("Decides each Friday"), hdr("Buy & Hold")],
   ...["v1", "v2"].map((v) => [v === "v1" ? "Version 1" : "Version 2",
     `${usd(wk(v, T24, "daily").final_value)} · ${wk(v, T24, "daily").round_trips} round trips`,
     `${usd(wk(v, T24, "weekly").final_value)} · ${wk(v, T24, "weekly").round_trips} round trips`,
@@ -480,10 +486,22 @@ const wrows = [
   ["Version 3", "never trades", "never trades", usd(BHT.final_value)],
 ];
 s.addTable(wrows, Object.assign({ x: M, y: 1.5, w: CW, colW: [2.6, 3.6, 3.6, 2.33], fontSize: 16, rowH: 0.62, margin: [0.06, 0.12, 0.06, 0.12] }, TABLE));
-text(s, "Each Friday after the close: predict Buy, Hold or Sell for the next 5 trading days, trade at Monday’s open, hold all week. Same frozen models; checked after the test results were known.", { x: M, y: 4.15, w: CW, h: 0.6, fontSize: 14, italic: true, color: C.accent3 });
+text(s, "Each Friday after the close: predict Buy, Hold or Sell for the next 5 trading days, trade at Monday’s open, hold all week. Same frozen models; checked after the test results were known. *Cash earns interest.", { x: M, y: 4.15, w: CW, h: 0.6, fontSize: 14, italic: true, color: C.accent3 });
 card(s, M, 4.85, 3.93, 1.6, "Half the trades", "Fewer, longer positions roughly halve trading costs.", { bodySize: 14, titleSize: 17 });
-card(s, M + 4.1, 4.85, 3.93, 1.6, "Same conclusion", "Still about $32,000 behind Buy & Hold on 2023–24.", { bodySize: 14, titleSize: 17, fill: "FBEDE4" });
+card(s, M + 4.1, 4.85, 3.93, 1.6, "Same conclusion", "Still about $27,000–33,000 behind Buy & Hold on 2023–24.", { bodySize: 14, titleSize: 17, fill: "FBEDE4" });
 card(s, M + 8.2, 4.85, 3.93, 1.6, "Slower, not smarter", `Over 2013–24, weekly v2 made ${usd(wk("v2", "2013–24 walk-forward", "weekly").final_value)} vs ${usd(wk("v2", "2013–24 walk-forward", "daily").final_value)} daily.`, { bodySize: 14, titleSize: 17 });
+
+// ---------- scorecard: return and risk ----------
+s = content("Return and risk, every version on one basis", S4b);
+const scRows = [["Buy & Hold", "Buy & Hold", "—"], ["v1 · decides daily", "v1", "daily"], ["v1 · decides weekly", "v1", "weekly"],
+  ["v2 · decides daily", "v2", "daily"], ["v2 · decides weekly", "v2", "weekly"], ["v3 · never trades", "v3", "daily"]];
+const sct = [[hdr("2023–24, $100,000"), hdr("Became"), hdr("Per year"), hdr("Ups and downs"), hdr("Worst fall"), hdr("Sharpe")],
+  ...scRows.map(([lab, k, sched]) => { const r = sc(k, "2023–24 test", sched); return [lab, usd(r.final_value), pct1(r.cagr), pct1(r.ann_vol), pct1(r.max_drawdown), r.sharpe.toFixed(2)]; })];
+s.addTable(sct, Object.assign({ x: M, y: 1.45, w: CW, colW: [3.2, 1.9, 1.6, 2.0, 1.75, 1.68], fontSize: 15, rowH: 0.42, margin: [0.03, 0.1, 0.03, 0.1] }, TABLE));
+text(s, "Cash earns interest for every version; Sharpe = return per unit of risk, above the cash rate. “Ups and downs” = annual volatility.", { x: M, y: 4.45, w: CW, h: 0.3, fontSize: 12, italic: true, color: C.accent3 });
+const wf2 = sc("v2", "2013–24 walk-forward", "daily"), wfb = sc("Buy & Hold", "2013–24 walk-forward", "—");
+card(s, M, 4.85, 5.98, 1.6, "Calmer, not better", "The models had smaller ups and downs (time in cash), but the same worst fall and a lower Sharpe.", { bodySize: 14, titleSize: 17 });
+card(s, M + 6.15, 4.85, 5.98, 1.6, "Over 12 years", `v2 cut the worst fall (${pct1(wf2.max_drawdown)} vs ${pct1(wfb.max_drawdown)}) but its Sharpe fell to ${wf2.sharpe.toFixed(2)} vs ${wfb.sharpe.toFixed(2)}.`, { bodySize: 14, titleSize: 17, fill: "FBEDE4" });
 
 // ---------- honesty ----------
 s = content("How we kept the test honest", S4b);
@@ -532,7 +550,7 @@ TITLES.push("Questions (closing)");
 s = pres.addSlide({ masterName: "Statement Dark", sectionTitle: S5 });
 s.addText("Questions?", { placeholder: "title" });
 s.addText([
-  { text: "$100,000 in 2023–24 → " + usd(T.bh_final) + " by waiting, " + usd(T.model_final) + " with v1, " + usd(V2T.final_value) + " with v2. With honest odds, v3’s best rule is not to trade.", options: { breakLine: true } },
+  { text: "$100,000 in 2023–24 → " + usd(T.bh_final) + " by waiting, " + usd(sc("v1", "2023–24 test", "daily").final_value) + " with v1, " + usd(V2T.final_value) + " with v2 (cash earning interest). With honest odds, v3’s best rule is not to trade.", options: { breakLine: true } },
   { text: " ", options: { breakLine: true } },
   { text: "github.com/TKCH121/spy", options: { fontSize: 18, color: C.accent4 } },
 ], { placeholder: "body" });
@@ -541,12 +559,12 @@ s.addText([
 // [tier, seconds, text]. Speak = say it; Flash = one line and move on; Skip = click past (backup for questions).
 const SCRIPT_TEXT = {
   "Cover": ["Speak", 20, "We’re Group 7. As the brief asks, our model predicts the best action for SPY over the next 5 trading days: Buy, Hold or Sell. The question: with $100,000, does trading on those predictions beat simply buying and waiting? The brief grades method, not profit, so we’ll show what we built and how we tested it."],
-  "What we delivered": ["Speak", 40, "Here’s everything the brief asked for and where to find it. An exploratory notebook on the features and the class balance. A modelling notebook with lagged features, time-ordered splits and tuning. A realistic backtest with fees and slippage, plotted against Buy & Hold. And a lessons-learned report. On top of that, two improved versions, each planned before any code was written. Throughout, 50 automated tests check that nothing sees the future."],
+  "What we delivered": ["Speak", 35, "Here’s everything the brief asked for and where to find it. An exploratory notebook on the features and the class balance. A modelling notebook with lagged features, time-ordered splits and tuning. A realistic backtest with fees and slippage, plotted against Buy & Hold. And a lessons-learned report. On top of that, two improved versions, each planned before any code was written. Throughout, 50 automated tests check that nothing sees the future."],
   "The question in one picture": ["Flash", 10, "Option A: buy once and wait. Option B: follow the model’s Buy, Hold or Sell prediction for the next 5 days, paying a fee on every trade."],
   "Five words you’ll hear today": ["Skip", 0, "Backup if the audience needs the terms: SPY, Buy & Hold, backtest, trading cost, drawdown."],
-  ["The answer: buy-and-wait won by " + usd(gap)]: ["Speak", 25, `The answer up front, on the 2023–24 test period: $100,000 left alone grew to ${usd(T.bh_final)}. Our model grew it to ${usd(T.model_final)}, about ${usd(gap)} less, and paid ${usd(T.model_fees)} in trading costs. The brief expected this; the rest explains why.`],
+  ["The answer: buy-and-wait won by " + usd(gap)]: ["Speak", 25, `The answer up front, on the 2023–24 test period: $100,000 left alone grew to ${usd(T.bh_final)}. Version 1, as built, grew it to ${usd(T.model_final)}, about ${usd(gap)} less, and its worst fall was no smaller. That version let cash earn nothing; with interest on cash, one of our improvements, it would reach ${usd(sc("v1", "2023–24 test", "daily").final_value)}, still well behind. The brief expected this; the rest explains why.`],
   "The two-year journey of $100,000": ["Flash", 10, "Note the flat orange stretch: the model sat in cash from December 2023 to April 2024 while the market rose about 14%."],
-  "How the model makes a decision, every evening": ["Speak", 25, "Every evening the model measures the market and predicts the action for the next 5 trading days: Buy, Hold or Sell. Buy means be invested, Sell means move to cash, Hold means keep the current position. Any change fills at the next morning’s open, so it never trades at a price it has already seen. A fresh 5-day prediction is made each day; slide 26 shows the once-a-week version."],
+  "How the model makes a decision": ["Speak", 25, "After the close, the model measures the market and predicts the action for the next 5 trading days: Buy, Hold or Sell. Buy means be invested, Sell means move to cash, Hold means keep the current position. Any change fills at the next open, so it never trades at a price it has already seen. We tested acting on a fresh prediction each trading day, the original design, and once a week, the brief’s literal reading, on slide 26."],
   "What the model looks at: 15 measurements": ["Speak", 20, "The brief asked for returns, at least three technical indicators and a volatility measure, all lagged. We used 15: returns, moving averages, RSI, MACD, Bollinger bands, volatility and volume, each using only data up to that day."],
   "What the model predicts: Buy, Hold or Sell for 5 days": ["Speak", 25, "The target uses the brief’s thresholds: up more than 1% in five days is Buy, down more than 1% is Sell, otherwise Hold. Down weeks are rare, about one in five, so the classes are imbalanced. We come back to that on slide 22."],
   "No cheating: textbook, practice exam, final exam": ["Speak", 45, "This is the core of the brief. No random shuffling: we train on 2010 to 2020, choose the model on 2021–22, lock everything, and only then open 2023–24, once. There’s a one-week buffer between periods, because each label looks a week ahead. Tuning used time-series cross-validation with the same buffer. Our accuracy, about 45%, sits in the range the brief calls normal: no sign of leakage."],
@@ -556,17 +574,18 @@ const SCRIPT_TEXT = {
   "Turning predictions into trades (v1’s rule)": ["Flash", 15, "v1’s exact rule: Buy when the model leans “up” by 5 points or more, Sell when it leans “down”, otherwise Hold. All in or all out, and at least 5 days in after buying."],
   ["Where the " + usd(gap) + " went"]: ["Speak", 35, "Where the money went. One long pause during a rally cost about $15,000. Overall it sat in cash 42% of the time, and those days were just as good as the days it was invested, so stepping out bought nothing. Costs were about $3,200, but even with zero fees it still trailed Buy & Hold. This is the core of our lessons-learned report."],
   "The real problem (statement)": ["Speak", 20, "The real problem: the model can tell how big next week’s move will be, not which way. And the trading rule only used the “which way” part. Its real skill never reached a trade."],
-  "What version 2 changes": ["Speak", 20, "Version 2 fixes that. It turns all three predictions into one expected gain, trades only when that beats the cost, and picks the model by money made, not just by prediction score."],
+  "What version 2 changes": ["Speak", 20, "Version 2 fixes that. It turns all three predictions into one expected gain, trades only when that beats the cost, picks the model by money made rather than prediction score, and lets cash earn interest instead of nothing."],
   "How we’ll know if it really works": ["Skip", 0, "Backup if asked: v2 is also judged against 1,000 random traders with the same time in the market, with error bars, and with cash earning T-bill interest."],
   "Version 2 results: $100,000, 2023–2024": ["Speak", 25, `Version 2 ended with ${usd(V2T.final_value)}, no better than version 1. More telling: it beat only ${pctBeat} of 1,000 random traders who spent the same time in the market. Its timing was no better than luck.`],
   "Twelve years, one year at a time": ["Flash", 10, "Re-trained every year from 2013 to 2024, it was ahead of Buy & Hold in only two of twelve years."],
   "Why version 2 still lost": ["Skip", 0, "Backup if asked: it stepped out too often (in the market about half the time), its down-week odds were inflated, and there was little direction skill underneath."],
-  "Class imbalance: good for predictions, bad for odds": ["Speak", 35, "The brief requires handling class imbalance. We used class weights, after testing SMOTE and no weighting in version 1. Balancing makes the model treat all three kinds of week as equally common, which is good for predictions. But it inflates the odds: the model predicted 30% down weeks against 21% in reality. Version 2 used those odds directly, so it kept selling."],
+  "Class imbalance: good for predictions, bad for odds": ["Speak", 30, "The brief requires handling class imbalance. We used class weights, after testing SMOTE and no weighting in version 1. Balancing makes the model treat all three kinds of week as equally common, which is good for predictions. But it inflates the odds: the model predicted 30% down weeks against 21% in reality. Version 2 used those odds directly, so it kept selling."],
   "Version 3: correct the odds first": ["Speak", 20, "Version 3 keeps the weights for training, then corrects the odds. On average that works: 21% predicted vs 21% real. But it failed our own year-by-year test, set in advance, and we report that."],
   "With honest odds, the best rule is: don’t trade": ["Speak", 20, "With honest odds, the rule we chose in advance picked a version that never sold: not in ten years of history, not in 2023–24, not on the 2025–26 holdout. It is Buy & Hold. Every version that traded did worse."],
-  "Which model, and how accurate?": ["Speak", 25, "Across versions: v1 used a random forest; v2 switched to gradient boosting because it chose by money, not score. Accuracy stayed between 41 and 48%, inside the brief’s normal range. Note v3: highest accuracy, lowest macro-F1, because corrected odds mostly call flat weeks. Accuracy alone would mislead."],
-  "One decision a week: the brief’s literal reading": ["Speak", 25, "The brief says “predict the optimal action over the next 5 trading days”, so we also ran every version deciding just once a week: after Friday’s close, trade at Monday’s open, hold all week. It halves the trades and costs, but the result barely moves, still about $32,000 behind Buy & Hold. The weakness is what the model predicts, not how often it acts."],
-  "How we kept the test honest": ["Speak", 25, "How we kept it honest: plans written and fingerprinted before any code, each final exam opened once, 50 automated look-ahead tests, and every change or failure logged rather than hidden."],
+  "Which model, and how accurate?": ["Speak", 20, "Across versions: v1 used a random forest; v2 switched to gradient boosting because it chose by money, not score. Accuracy stayed between 41 and 48%, inside the brief’s normal range. Note v3: highest accuracy, lowest macro-F1, because corrected odds mostly call flat weeks. Accuracy alone would mislead."],
+  "One decision a week: the brief’s literal reading": ["Speak", 20, "The brief says “predict the optimal action over the next 5 trading days”, so we also ran every version deciding just once a week: after Friday’s close, trade at Monday’s open, hold all week. It halves the trades and costs, but the result barely moves, still about $27,000 to $33,000 behind Buy & Hold. The weakness is what the model predicts, not how often it acts."],
+  "Return and risk, every version on one basis": ["Speak", 30, "Not just return: here every version is on one basis, with cash earning interest. The models had smaller ups and downs, because they sat in cash, but their worst fall was no smaller and their Sharpe ratio, return per unit of risk, was lower. Over twelve years version 2 did cut the worst fall, from 34% to 22%, but gave up far more return. Version 3 simply matches Buy & Hold."],
+  "How we kept the test honest": ["Speak", 20, "How we kept it honest: plans written and fingerprinted before any code, each final exam opened once, 50 automated look-ahead tests, and every change or failure logged rather than hidden."],
   "A flaw of machine learning, or of the question?": ["Speak", 25, "Is this a flaw of machine learning? Mostly it’s the question: predicting next week’s direction for the most-watched fund in the world from its own public prices. Machine learning helps elsewhere, like ranking many stocks or forecasting risk. That’s why our fair bar was beating random timing, not just beating Buy & Hold."],
   "What we learned": ["Speak", 20, "Four lessons: the size of a move is predictable, the direction isn’t; sitting in cash has a cost; the past changes; and good predictions don’t automatically make good trades."],
   "Questions (closing)": ["Flash", 10, "Everything is in the repository on screen. Thank you, and we’re happy to take questions."],

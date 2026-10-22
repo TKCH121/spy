@@ -4,22 +4,24 @@ A machine-learning model predicts the best action for SPY (the S&P 500 fund) ove
 
 ## The answer in three lines
 
-1. **Every version lost to Buy & Hold.** On 2023–24, $100,000 became **$156,546** by buying and waiting, **$123,714** with v1, and **$121,812** with v2. v3's best rule **never traded**, so it equals Buy & Hold.
+1. **Every version lost to Buy & Hold, on return and on risk-adjusted return.** On 2023–24, with cash earning T-bills, $100,000 became **$156,546** by buying and waiting (Sharpe 1.43, worst fall −10.0%). v1 made **$129,069** (0.85, −9.4%) and v2 **$121,812** (0.59, −10.0%). v3's best rule **never traded**, so it equals Buy & Hold.
 2. **The model can tell how big next week's move will be, not which way.** It beats guessing as a classifier (test macro-F1 0.41 vs 0.31), but has no usable timing skill: v2 beat only 26% of 1,000 random traders.
 3. **Why, in one sentence:** predicting next week's direction of the world's most-watched fund from its own public prices leaves almost no signal, and every day out of a rising market costs money. Full write-up: **[outputs/SUMMARY.md](outputs/SUMMARY.md)**.
 
 ## Versions at a glance
 
-| | Model | Key change | Test accuracy / macro-F1 | $100,000 on 2023–24 | Report |
-|---|---|---|---|---|---|
-| **v1** (Peter Li) | Random forest | The brief's baseline project | 44.9% / 0.408 | $123,714 | [outputs/report.md](outputs/report.md) |
-| **v2** | Gradient boosting | Uses all three probabilities in an expected-return rule; selects by money, not score | 40.9% / 0.376 | $121,812 | [outputs/v2/report.md](outputs/v2/report.md) |
-| **v3** | Gradient boosting + calibrated odds | Corrects the odds that class weighting inflates | 48.4% / 0.349 | $156,546 (never trades) | [outputs/v3/report.md](outputs/v3/report.md) |
-| Buy & Hold | — | — | — | **$156,546** | — |
+| | Model | Key change | Test accuracy / macro-F1 | $100,000 on 2023–24 | Max drawdown | Sharpe | Report |
+|---|---|---|---|---|---|---|---|
+| **v1** (Peter Li) | Random forest | The brief's baseline project | 44.9% / 0.408 | $129,069 ($123,714 as built, cash at 0%) | −9.4% | 0.85 | [outputs/report.md](outputs/report.md) |
+| **v2** | Gradient boosting | Uses all three probabilities in an expected-return rule; selects by money, not score; cash earns T-bills | 40.9% / 0.376 | $121,812 | −10.0% | 0.59 | [outputs/v2/report.md](outputs/v2/report.md) |
+| **v3** | Gradient boosting + calibrated odds | Corrects the odds that class weighting inflates | 48.4% / 0.349 | $156,546 (never trades) | −10.0% | 1.43 | [outputs/v3/report.md](outputs/v3/report.md) |
+| Buy & Hold | — | — | — | **$156,546** | −10.0% | **1.43** | — |
+
+All four rows are on one basis: costs included, cash earning the T-bill rate, and Sharpe measured over T-bills. Volatility, Calmar, the 12-year walk-forward and the 2025–26 holdout are in the [scorecard](outputs/SUMMARY.md#scorecard-return-and-risk-on-one-basis-notebook).
 
 v2 and v3 predict an execution-aligned label (open → open), so their scores are not exactly comparable with v1's. v3's accuracy is higher, but only because calibrated odds call the common "flat" weeks more often. Its macro-F1 is the lowest.
 
-**One decision a week** ([report](outputs/weekly/report.md)): after Friday's close, predict for the next 5 days, trade at Monday's open, and hold all week. This uses the same frozen models and roughly halves trading costs: on 2023–24, v1 makes $124,654 and v2 $123,834. The conclusion doesn't change. It is a sensitivity check, decided after the test results were known.
+**One decision a week** ([report](outputs/weekly/report.md)): after Friday's close, predict for the next 5 days, trade at Monday's open, and hold all week. This uses the same frozen models and roughly halves trading costs: on 2023–24, v1 makes $129,705 and v2 $123,834. The conclusion doesn't change. It is a sensitivity check, decided after the test results were known.
 
 ## For assessors: where each deliverable is
 
@@ -32,6 +34,7 @@ v2 and v3 predict an execution-aligned label (open → open), so their scores ar
 | **No look-ahead bias** | [tests/](tests/) (50 tests, run in CI) | Features unchanged when future data is cut or shocked; labels and splits never cross boundaries; no fit reads labels after its window |
 | **Class imbalance** | `02_modeling` §4 (E04–E08), [outputs/v3/calibration_report.md](outputs/v3/calibration_report.md) | Class weights vs SMOTE vs none, and what weighting does to the odds |
 | Beyond the brief | `v2_02_modeling`, `v3_01…03`, [docs/](docs/) | Two improved versions, each designed (and, for v3, fingerprinted) before any code was written |
+| **Return and risk scorecard** | [notebooks/scorecard.ipynb](notebooks/scorecard.ipynb) | Every version and schedule on one basis: final value, annual return, volatility, max drawdown, Sharpe, Calmar, costs, time invested |
 | Weekly decisions (the brief's literal "next 5 days") | [notebooks/weekly_decisions.ipynb](notebooks/weekly_decisions.ipynb) | Every version re-run with one Buy/Hold/Sell decision per week |
 
 **Suggested reading order (about 20 minutes):** this page → [outputs/SUMMARY.md](outputs/SUMMARY.md) → notebooks `01` → `02` → `03` → the v2 and v3 reports. The slides are in [presentation/](presentation/).
@@ -42,7 +45,7 @@ v2 and v3 predict an execution-aligned label (open → open), so their scores ar
 - **Splits:** Train 2010–2020 / Validation 2021–2022 / Test 2023–2024, never shuffled. Rows whose label window would cross a boundary are dropped: 5 rows for v1's close→close label, 6 for v2/v3's open→open label. Tuning uses `TimeSeriesSplit` with the same gap.
 - **Preprocessing:** all scaling and resampling sit inside sklearn/imblearn Pipelines and are fit on each training fold only.
 - **Selection rules stated before results:** v1 in [docs/](docs/); v2 in [docs/v2_design_note.md](docs/v2_design_note.md); v3 in [docs/v3_design_note.md](docs/v3_design_note.md), with its SHA-256. Each test period is opened once, after freezing. Later changes are logged as dated deviations.
-- **Evidence, not one number:** a 12-year walk-forward with yearly refits, block-bootstrap confidence intervals, a 1,000-path random-timing benchmark with matched exposure, and cash earning T-bill interest (v2/v3).
+- **Evidence, not one number:** a 12-year walk-forward with yearly refits, block-bootstrap confidence intervals, a 1,000-path random-timing benchmark with matched exposure, and cash earning T-bill interest (one basis for every version in the scorecard).
 
 ## Repository layout
 
@@ -61,6 +64,7 @@ notebooks/
   v3_02_development_and_freeze.ipynb  v3 · 2013–2022 selection and freeze
   v3_03_test_and_holdout.ipynb     v3 · 2023–24 and the 2025–26 holdout
   weekly_decisions.ipynb           all versions · one decision per week (sensitivity check)
+  scorecard.ipynb                  all versions · return and risk on one basis
 src/
   config.py      every design constant (dates, thresholds, costs, gaps)
   data.py        download / load the price snapshot
@@ -103,7 +107,7 @@ conda run -n spy-m3 python -m pytest -q
 ```
 
 ```bash
-cd notebooks && for n in 01_eda 02_modeling 03_backtest 04_strategy_research 05_holdout_2025 v2_02_modeling v3_01_calibration v3_02_development_and_freeze v3_03_test_and_holdout weekly_decisions; do conda run -n spy-m3 jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.kernel_name=spy-m3 $n.ipynb; done
+cd notebooks && for n in 01_eda 02_modeling 03_backtest 04_strategy_research 05_holdout_2025 v2_02_modeling v3_01_calibration v3_02_development_and_freeze v3_03_test_and_holdout weekly_decisions scorecard; do conda run -n spy-m3 jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.kernel_name=spy-m3 $n.ipynb; done
 ```
 
 Code style is checked with `ruff check src tests` and `ruff format --check src tests` (config in `ruff.toml`). On some Windows setups, pytest needs `--basetemp` pointing to a writable folder.

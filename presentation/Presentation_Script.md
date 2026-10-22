@@ -1,18 +1,18 @@
 # Presentation script — Can a computer beat “buy and wait”?
 
-Module 3 Group 7 · goes with `SPY_Model_Presentation.pptx` (30 slides) · **about 10 minutes of speaking**, plus clicks and questions.
+Module 3 Group 7 · goes with `SPY_Model_Presentation.pptx` (31 slides) · **about 10 minutes of speaking**, plus clicks and questions.
 
 **Speak** slides carry the deliverables the brief grades. **Flash** slides get one line. **Skip** slides are there as backup for questions: click past them. Say it in your own words. Fill in the presenter names and date on slide 1.
 
 | Slide | Title | Tier | Time |
 |---|---|---|---|
 | 1 | Cover | Speak | 20 s |
-| 2 | What we delivered | Speak | 40 s |
+| 2 | What we delivered | Speak | 35 s |
 | 3 | The question in one picture | Flash | 10 s |
 | 4 | Five words you’ll hear today | Skip | — |
 | 5 | The answer: buy-and-wait won by $32,832 | Speak | 25 s |
 | 6 | The two-year journey of $100,000 | Flash | 10 s |
-| 7 | How the model makes a decision, every evening | Speak | 25 s |
+| 7 | How the model makes a decision | Speak | 25 s |
 | 8 | What the model looks at: 15 measurements | Speak | 20 s |
 | 9 | What the model predicts: Buy, Hold or Sell for 5 days | Speak | 25 s |
 | 10 | No cheating: textbook, practice exam, final exam | Speak | 45 s |
@@ -27,21 +27,22 @@ Module 3 Group 7 · goes with `SPY_Model_Presentation.pptx` (30 slides) · **abo
 | 19 | Version 2 results: $100,000, 2023–2024 | Speak | 25 s |
 | 20 | Twelve years, one year at a time | Flash | 10 s |
 | 21 | Why version 2 still lost | Skip | — |
-| 22 | Class imbalance: good for predictions, bad for odds | Speak | 35 s |
+| 22 | Class imbalance: good for predictions, bad for odds | Speak | 30 s |
 | 23 | Version 3: correct the odds first | Speak | 20 s |
 | 24 | With honest odds, the best rule is: don’t trade | Speak | 20 s |
-| 25 | Which model, and how accurate? | Speak | 25 s |
-| 26 | One decision a week: the brief’s literal reading | Speak | 25 s |
-| 27 | How we kept the test honest | Speak | 25 s |
-| 28 | A flaw of machine learning, or of the question? | Speak | 25 s |
-| 29 | What we learned | Speak | 20 s |
-| 30 | Questions (closing) | Flash | 10 s |
+| 25 | Which model, and how accurate? | Speak | 20 s |
+| 26 | One decision a week: the brief’s literal reading | Speak | 20 s |
+| 27 | Return and risk, every version on one basis | Speak | 30 s |
+| 28 | How we kept the test honest | Speak | 20 s |
+| 29 | A flaw of machine learning, or of the question? | Speak | 25 s |
+| 30 | What we learned | Speak | 20 s |
+| 31 | Questions (closing) | Flash | 10 s |
 
 ## 1. Cover (~20 s)
 
 We’re Group 7. As the brief asks, our model predicts the best action for SPY over the next 5 trading days: Buy, Hold or Sell. The question: with $100,000, does trading on those predictions beat simply buying and waiting? The brief grades method, not profit, so we’ll show what we built and how we tested it.
 
-## 2. What we delivered (~40 s)
+## 2. What we delivered (~35 s)
 
 Here’s everything the brief asked for and where to find it. An exploratory notebook on the features and the class balance. A modelling notebook with lagged features, time-ordered splits and tuning. A realistic backtest with fees and slippage, plotted against Buy & Hold. And a lessons-learned report. On top of that, two improved versions, each planned before any code was written. Throughout, 50 automated tests check that nothing sees the future.
 
@@ -55,15 +56,15 @@ _Backup if the audience needs the terms: SPY, Buy & Hold, backtest, trading cost
 
 ## 5. The answer: buy-and-wait won by $32,832 (~25 s)
 
-The answer up front, on the 2023–24 test period: $100,000 left alone grew to $156,546. Our model grew it to $123,714, about $32,832 less, and paid $3,237 in trading costs. The brief expected this; the rest explains why.
+The answer up front, on the 2023–24 test period: $100,000 left alone grew to $156,546. Version 1, as built, grew it to $123,714, about $32,832 less, and its worst fall was no smaller. That version let cash earn nothing; with interest on cash, one of our improvements, it would reach $129,069, still well behind. The brief expected this; the rest explains why.
 
 ## 6. The two-year journey of $100,000 · flash, one line (~10 s)
 
 Note the flat orange stretch: the model sat in cash from December 2023 to April 2024 while the market rose about 14%.
 
-## 7. How the model makes a decision, every evening (~25 s)
+## 7. How the model makes a decision (~25 s)
 
-Every evening the model measures the market and predicts the action for the next 5 trading days: Buy, Hold or Sell. Buy means be invested, Sell means move to cash, Hold means keep the current position. Any change fills at the next morning’s open, so it never trades at a price it has already seen. A fresh 5-day prediction is made each day; slide 26 shows the once-a-week version.
+After the close, the model measures the market and predicts the action for the next 5 trading days: Buy, Hold or Sell. Buy means be invested, Sell means move to cash, Hold means keep the current position. Any change fills at the next open, so it never trades at a price it has already seen. We tested acting on a fresh prediction each trading day, the original design, and once a week, the brief’s literal reading, on slide 26.
 
 ## 8. What the model looks at: 15 measurements (~20 s)
 
@@ -103,7 +104,7 @@ The real problem: the model can tell how big next week’s move will be, not whi
 
 ## 17. What version 2 changes (~20 s)
 
-Version 2 fixes that. It turns all three predictions into one expected gain, trades only when that beats the cost, and picks the model by money made, not just by prediction score.
+Version 2 fixes that. It turns all three predictions into one expected gain, trades only when that beats the cost, picks the model by money made rather than prediction score, and lets cash earn interest instead of nothing.
 
 ## 18. How we’ll know if it really works · skip: click past
 
@@ -121,7 +122,7 @@ Re-trained every year from 2013 to 2024, it was ahead of Buy & Hold in only two 
 
 _Backup if asked: it stepped out too often (in the market about half the time), its down-week odds were inflated, and there was little direction skill underneath._
 
-## 22. Class imbalance: good for predictions, bad for odds (~35 s)
+## 22. Class imbalance: good for predictions, bad for odds (~30 s)
 
 The brief requires handling class imbalance. We used class weights, after testing SMOTE and no weighting in version 1. Balancing makes the model treat all three kinds of week as equally common, which is good for predictions. But it inflates the odds: the model predicted 30% down weeks against 21% in reality. Version 2 used those odds directly, so it kept selling.
 
@@ -133,26 +134,30 @@ Version 3 keeps the weights for training, then corrects the odds. On average tha
 
 With honest odds, the rule we chose in advance picked a version that never sold: not in ten years of history, not in 2023–24, not on the 2025–26 holdout. It is Buy & Hold. Every version that traded did worse.
 
-## 25. Which model, and how accurate? (~25 s)
+## 25. Which model, and how accurate? (~20 s)
 
 Across versions: v1 used a random forest; v2 switched to gradient boosting because it chose by money, not score. Accuracy stayed between 41 and 48%, inside the brief’s normal range. Note v3: highest accuracy, lowest macro-F1, because corrected odds mostly call flat weeks. Accuracy alone would mislead.
 
-## 26. One decision a week: the brief’s literal reading (~25 s)
+## 26. One decision a week: the brief’s literal reading (~20 s)
 
-The brief says “predict the optimal action over the next 5 trading days”, so we also ran every version deciding just once a week: after Friday’s close, trade at Monday’s open, hold all week. It halves the trades and costs, but the result barely moves, still about $32,000 behind Buy & Hold. The weakness is what the model predicts, not how often it acts.
+The brief says “predict the optimal action over the next 5 trading days”, so we also ran every version deciding just once a week: after Friday’s close, trade at Monday’s open, hold all week. It halves the trades and costs, but the result barely moves, still about $27,000 to $33,000 behind Buy & Hold. The weakness is what the model predicts, not how often it acts.
 
-## 27. How we kept the test honest (~25 s)
+## 27. Return and risk, every version on one basis (~30 s)
+
+Not just return: here every version is on one basis, with cash earning interest. The models had smaller ups and downs, because they sat in cash, but their worst fall was no smaller and their Sharpe ratio, return per unit of risk, was lower. Over twelve years version 2 did cut the worst fall, from 34% to 22%, but gave up far more return. Version 3 simply matches Buy & Hold.
+
+## 28. How we kept the test honest (~20 s)
 
 How we kept it honest: plans written and fingerprinted before any code, each final exam opened once, 50 automated look-ahead tests, and every change or failure logged rather than hidden.
 
-## 28. A flaw of machine learning, or of the question? (~25 s)
+## 29. A flaw of machine learning, or of the question? (~25 s)
 
 Is this a flaw of machine learning? Mostly it’s the question: predicting next week’s direction for the most-watched fund in the world from its own public prices. Machine learning helps elsewhere, like ranking many stocks or forecasting risk. That’s why our fair bar was beating random timing, not just beating Buy & Hold.
 
-## 29. What we learned (~20 s)
+## 30. What we learned (~20 s)
 
 Four lessons: the size of a move is predictable, the direction isn’t; sitting in cash has a cost; the past changes; and good predictions don’t automatically make good trades.
 
-## 30. Questions (closing) · flash, one line (~10 s)
+## 31. Questions (closing) · flash, one line (~10 s)
 
 Everything is in the repository on screen. Thank you, and we’re happy to take questions.
