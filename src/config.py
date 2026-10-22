@@ -29,6 +29,12 @@ TEST = ("2023-01-01", "2024-12-31")
 GAP = HORIZON  # rows dropped at the end of each segment (overlapping labels)
 CV_SPLITS = 5
 
+# --- v2 label (docs/v2_design_note.md, C1) ----------------------------------
+# Bars ahead of row t that each label reads: close -> Close(t+h); open -> Open(t+h+1).
+LABEL_LOOKAHEAD = {"close": HORIZON, "open": HORIZON + 1}
+V2_LABEL_KIND = "open"  # execution-aligned: Open(t+1) -> Open(t+6)
+V2_GAP = LABEL_LOOKAHEAD[V2_LABEL_KIND]  # segment and CV gap for the v2 label
+
 # --- Backtest ---------------------------------------------------------------
 INIT_CASH = 100_000
 FEES = 0.001  # per side
@@ -43,8 +49,16 @@ SEED = 42
 #   signal rule -> highest after-cost Sharpe on the validation-period backtest;
 #                  ties broken by fewer trades.
 # Frozen at the end of P6 (mirrors outputs/frozen_config.json, written by 02_modeling).
-FINAL_MODEL = {"experiment": "E06", "model": "RandomForestClassifier",
-               "params": {"class_weight": "balanced", "n_estimators": 300, "max_depth": None,
-                          "max_features": "sqrt", "min_samples_leaf": 68},
-               "features": "all 15 (FEATURE_COLS)"}
+FINAL_MODEL = {
+    "experiment": "E06",
+    "model": "RandomForestClassifier",
+    "params": {
+        "class_weight": "balanced",
+        "n_estimators": 300,
+        "max_depth": None,
+        "max_features": "sqrt",
+        "min_samples_leaf": 68,
+    },
+    "features": "all 15 (FEATURE_COLS)",
+}
 FINAL_SIGNAL_RULE = {"margin": 0.05, "min_hold": 5}

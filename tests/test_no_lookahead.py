@@ -21,8 +21,9 @@ def _check_truncation(raw: pd.DataFrame, n_dates: int = 25):
     dates = sorted(rng.choice(valid, size=n_dates, replace=False))
     for t in dates:
         trunc = build_features(raw.loc[:t])
-        pd.testing.assert_series_equal(trunc.loc[t], full.loc[t], check_names=False,
-                                       rtol=1e-10, atol=1e-12)
+        pd.testing.assert_series_equal(
+            trunc.loc[t], full.loc[t], check_names=False, rtol=1e-10, atol=1e-12
+        )
 
 
 def test_truncation_synthetic(synthetic_ohlcv):
@@ -31,6 +32,7 @@ def test_truncation_synthetic(synthetic_ohlcv):
 
 def test_truncation_real_snapshot():
     from src.data import load_snapshot
+
     try:
         raw = load_snapshot()
     except FileNotFoundError:
@@ -50,8 +52,9 @@ def test_future_shock_does_not_move_past_features(synthetic_ohlcv):
 
 def test_no_negative_shift_or_centered_window_outside_labels():
     pattern = re.compile(r"shift\(\s*-|center\s*=\s*True")
-    offenders = [p.name for p in SRC.glob("*.py")
-                 if p.name != "labels.py" and pattern.search(p.read_text())]
+    offenders = [
+        p.name for p in SRC.glob("*.py") if p.name != "labels.py" and pattern.search(p.read_text())
+    ]
     assert offenders == [], f"future-looking operations found in {offenders}"
 
 

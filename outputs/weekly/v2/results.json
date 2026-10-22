@@ -1,0 +1,313 @@
+{
+  "frozen_config": {
+    "model": "LR",
+    "default": "cash",
+    "params": {
+      "clf__C": 0.014618962793704957
+    },
+    "label": "\u00b11% open(t+1)\u2192open(t+6)",
+    "gap": 6,
+    "hurdle": 0.003,
+    "mu_note": "class means re-estimated on the training rows of every fit",
+    "val_sharpe_excess": 0.207,
+    "val_final_value": 105397.32,
+    "val_bh_sharpe_excess": 0.166,
+    "schedule": "weekly",
+    "frozen_before_test": true,
+    "plan_sha256": "82602bdd44c1797b167933a11fe610c823d14ef2133ef9eed99a742a59ae644a"
+  },
+  "tuning": {
+    "LR": {
+      "cv_log_loss": 1.045,
+      "cv_std": 0.058,
+      "val_log_loss": 1.1062,
+      "val_macro_f1": 0.3662
+    },
+    "RF": {
+      "cv_log_loss": 1.0408,
+      "cv_std": 0.0228,
+      "val_log_loss": 1.0763,
+      "val_macro_f1": 0.4272
+    },
+    "HGB": {
+      "cv_log_loss": 1.0452,
+      "cv_std": 0.0225,
+      "val_log_loss": 1.1144,
+      "val_macro_f1": 0.3561
+    }
+  },
+  "validation_selection": [
+    {
+      "model": "LR",
+      "default": "cash",
+      "final_value": 105397.32,
+      "total_return": 0.054,
+      "cagr": 0.0267,
+      "ann_vol": 0.1054,
+      "sharpe_excess": 0.207,
+      "max_drawdown": -0.1668,
+      "round_trips": 2,
+      "exposure": 0.193,
+      "total_fees": 411.44
+    },
+    {
+      "model": "RF",
+      "default": "long",
+      "final_value": 97864.3,
+      "total_return": -0.0214,
+      "cagr": -0.0108,
+      "ann_vol": 0.1297,
+      "sharpe_excess": -0.096,
+      "max_drawdown": -0.1167,
+      "round_trips": 8,
+      "exposure": 0.308,
+      "total_fees": 1579.04
+    },
+    {
+      "model": "HGB",
+      "default": "long",
+      "final_value": 92451.14,
+      "total_return": -0.0755,
+      "cagr": -0.0386,
+      "ann_vol": 0.1539,
+      "sharpe_excess": -0.244,
+      "max_drawdown": -0.1835,
+      "round_trips": 7,
+      "exposure": 0.398,
+      "total_fees": 1285.01
+    },
+    {
+      "model": "LR",
+      "default": "long",
+      "final_value": 86945.84,
+      "total_return": -0.1305,
+      "cagr": -0.0677,
+      "ann_vol": 0.167,
+      "sharpe_excess": -0.397,
+      "max_drawdown": -0.2209,
+      "round_trips": 3,
+      "exposure": 0.451,
+      "total_fees": 479.52
+    },
+    {
+      "model": "HGB",
+      "default": "cash",
+      "final_value": 91932.05,
+      "total_return": -0.0807,
+      "cagr": -0.0413,
+      "ann_vol": 0.1002,
+      "sharpe_excess": -0.472,
+      "max_drawdown": -0.1779,
+      "round_trips": 5,
+      "exposure": 0.135,
+      "total_fees": 940.81
+    },
+    {
+      "model": "RF",
+      "default": "cash",
+      "final_value": 102025.76,
+      "total_return": 0.0203,
+      "cagr": 0.0101,
+      "ann_vol": 0.0009,
+      "sharpe_excess": -0.709,
+      "max_drawdown": 0.0,
+      "round_trips": 0,
+      "exposure": 0.0,
+      "total_fees": 0.0
+    }
+  ],
+  "validation_bh": {
+    "strategy": "Buy & Hold",
+    "final_value": 104773.32,
+    "total_return": 0.0477,
+    "cagr": 0.0236,
+    "ann_vol": 0.1949,
+    "sharpe_excess": 0.166,
+    "max_drawdown": -0.245,
+    "round_trips": 1,
+    "exposure": 1.0,
+    "total_fees": 99.9
+  },
+  "test": [
+    {
+      "strategy": "v2 \u00b7 LR \u00b7 default-cash",
+      "final_value": 110452.66,
+      "total_return": 0.1045,
+      "cagr": 0.0512,
+      "ann_vol": 0.0003,
+      "sharpe_excess": -0.709,
+      "max_drawdown": 0.0,
+      "round_trips": 0,
+      "exposure": 0.0,
+      "total_fees": 0.0
+    },
+    {
+      "strategy": "Buy & Hold SPY",
+      "final_value": 156546.25,
+      "total_return": 0.5655,
+      "cagr": 0.2523,
+      "ann_vol": 0.1283,
+      "sharpe_excess": 1.43,
+      "max_drawdown": -0.0997,
+      "round_trips": 1,
+      "exposure": 1.0,
+      "total_fees": 99.9
+    }
+  ],
+  "test_classification": {
+    "v2 model": {
+      "n": 496.0,
+      "accuracy": 0.4536,
+      "macro_f1": 0.4043,
+      "recall_Sell": 0.3021,
+      "recall_Hold": 0.7376,
+      "recall_Buy": 0.2374,
+      "log_loss": 1.0506
+    },
+    "B0_majority": {
+      "n": 496.0,
+      "accuracy": 0.4073,
+      "macro_f1": 0.1929,
+      "recall_Sell": 0.0,
+      "recall_Hold": 1.0,
+      "recall_Buy": 0.0,
+      "log_loss": null
+    },
+    "B1_stratified": {
+      "n": 496.0,
+      "accuracy": 0.3387,
+      "macro_f1": 0.3173,
+      "recall_Sell": 0.2396,
+      "recall_Hold": 0.4356,
+      "recall_Buy": 0.2879,
+      "log_loss": null
+    }
+  },
+  "v1_test_final_value": 123713.66,
+  "evidence": {
+    "random_timing_percentile": 0.0,
+    "random_median_final": 110452.66,
+    "sharpe_diff_vs_bh_ci95": [
+      -5.044,
+      -1.064
+    ],
+    "macro_f1_diff_vs_B1_ci95": [
+      0.012,
+      0.152
+    ],
+    "n_cash_spells": 0
+  },
+  "attribution": [],
+  "walk_forward": [
+    {
+      "strategy": "v2 walk-forward",
+      "final_value": 140013.24,
+      "total_return": 0.4001,
+      "cagr": 0.0285,
+      "ann_vol": 0.0301,
+      "sharpe_excess": 0.46,
+      "max_drawdown": -0.0469,
+      "round_trips": 8,
+      "exposure": 0.019,
+      "total_fees": 1833.2
+    },
+    {
+      "strategy": "Buy & Hold",
+      "final_value": 499270.92,
+      "total_return": 3.9927,
+      "cagr": 0.1436,
+      "ann_vol": 0.167,
+      "sharpe_excess": 0.8,
+      "max_drawdown": -0.3372,
+      "round_trips": 1,
+      "exposure": 1.0,
+      "total_fees": 99.9
+    }
+  ],
+  "walk_forward_yearly": [
+    {
+      "year": 2013,
+      "v2": 0.0005,
+      "Buy & Hold": 0.29,
+      "v2 \u2212 B&H": -0.2895,
+      "exposure": 0.0
+    },
+    {
+      "year": 2014,
+      "v2": 0.0158,
+      "Buy & Hold": 0.1456,
+      "v2 \u2212 B&H": -0.1298,
+      "exposure": 0.0397
+    },
+    {
+      "year": 2015,
+      "v2": 0.0051,
+      "Buy & Hold": 0.0129,
+      "v2 \u2212 B&H": -0.0077,
+      "exposure": 0.0357
+    },
+    {
+      "year": 2016,
+      "v2": 0.0406,
+      "Buy & Hold": 0.1359,
+      "v2 \u2212 B&H": -0.0953,
+      "exposure": 0.0198
+    },
+    {
+      "year": 2017,
+      "v2": 0.0092,
+      "Buy & Hold": 0.2078,
+      "v2 \u2212 B&H": -0.1986,
+      "exposure": 0.0
+    },
+    {
+      "year": 2018,
+      "v2": 0.1178,
+      "Buy & Hold": -0.0525,
+      "v2 \u2212 B&H": 0.1702,
+      "exposure": 0.0398
+    },
+    {
+      "year": 2019,
+      "v2": 0.029,
+      "Buy & Hold": 0.3109,
+      "v2 \u2212 B&H": -0.2819,
+      "exposure": 0.0119
+    },
+    {
+      "year": 2020,
+      "v2": 0.0076,
+      "Buy & Hold": 0.1724,
+      "v2 \u2212 B&H": -0.1647,
+      "exposure": 0.0593
+    },
+    {
+      "year": 2021,
+      "v2": 0.0003,
+      "Buy & Hold": 0.3051,
+      "v2 \u2212 B&H": -0.3047,
+      "exposure": 0.0
+    },
+    {
+      "year": 2022,
+      "v2": 0.0199,
+      "Buy & Hold": -0.1865,
+      "v2 \u2212 B&H": 0.2064,
+      "exposure": 0.0
+    },
+    {
+      "year": 2023,
+      "v2": 0.0491,
+      "Buy & Hold": 0.2671,
+      "v2 \u2212 B&H": -0.218,
+      "exposure": 0.02
+    },
+    {
+      "year": 2024,
+      "v2": 0.0506,
+      "Buy & Hold": 0.2559,
+      "v2 \u2212 B&H": -0.2053,
+      "exposure": 0.0
+    }
+  ]
+}

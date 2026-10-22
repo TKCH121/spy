@@ -1,0 +1,99 @@
+{
+  "frozen": "C3-L",
+  "secondary_2023_2024": {
+    "strategy": {
+      "strategy": "v3 C3-L",
+      "final_value": 156546.25,
+      "total_return": 0.5655,
+      "cagr": 0.2523,
+      "ann_vol": 0.1283,
+      "sharpe_excess": 1.43,
+      "max_drawdown": -0.0997,
+      "round_trips": 1,
+      "exposure": 1.0,
+      "total_fees": 99.9
+    },
+    "buy_and_hold": {
+      "strategy": "Buy & Hold",
+      "final_value": 156546.25,
+      "total_return": 0.5655,
+      "cagr": 0.2523,
+      "ann_vol": 0.1283,
+      "sharpe_excess": 1.43,
+      "max_drawdown": -0.0997,
+      "round_trips": 1,
+      "exposure": 1.0,
+      "total_fees": 99.9
+    },
+    "classification": {
+      "n": 496,
+      "accuracy": 0.4839,
+      "balanced_accuracy": 0.3989,
+      "macro_f1": 0.3494,
+      "precision_Sell": 0.0,
+      "recall_Sell": 0.0,
+      "f1_Sell": 0.0,
+      "precision_Hold": 0.489,
+      "recall_Hold": 0.7673,
+      "f1_Hold": 0.5973,
+      "precision_Buy": 0.4749,
+      "recall_Buy": 0.4293,
+      "f1_Buy": 0.4509,
+      "log_loss": 1.0187
+    }
+  },
+  "holdout_2025_2026": {
+    "strategy": {
+      "strategy": "v3 C3-L",
+      "final_value": 134409.74,
+      "total_return": 0.3441,
+      "cagr": 0.1823,
+      "ann_vol": 0.1694,
+      "sharpe_excess": 0.844,
+      "max_drawdown": -0.1876,
+      "round_trips": 1,
+      "exposure": 1.0,
+      "total_fees": 99.9
+    },
+    "buy_and_hold": {
+      "strategy": "Buy & Hold",
+      "final_value": 134409.74,
+      "total_return": 0.3441,
+      "cagr": 0.1823,
+      "ann_vol": 0.1694,
+      "sharpe_excess": 0.844,
+      "max_drawdown": -0.1876,
+      "round_trips": 1,
+      "exposure": 1.0,
+      "total_fees": 99.9
+    },
+    "classification": {
+      "n": 439,
+      "accuracy": 0.5034,
+      "balanced_accuracy": 0.4212,
+      "macro_f1": 0.3714,
+      "precision_Sell": 0.0,
+      "recall_Sell": 0.0,
+      "f1_Sell": 0.0,
+      "precision_Hold": 0.536,
+      "recall_Hold": 0.6837,
+      "f1_Hold": 0.6009,
+      "precision_Buy": 0.4603,
+      "recall_Buy": 0.58,
+      "f1_Buy": 0.5133,
+      "log_loss": 1.0289
+    },
+    "evidence": {
+      "round_trips": 1,
+      "exposure": 1.0,
+      "random_timing_percentile": null,
+      "random_timing_note": "not meaningful: the strategy never switched, so every random path with its exposure is the same path",
+      "success_criterion_met": null,
+      "sharpe_diff_vs_bh_ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    "attribution": []
+  }
+}

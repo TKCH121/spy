@@ -1,0 +1,11 @@
+{
+  "version": "v1w",
+  "model": "RF (E06, unchanged)",
+  "margin": "argmax",
+  "schedule": "weekly: decide after the week's last close, fill next open, hold the week",
+  "val_sharpe": 0.578,
+  "val_final_value": 116257.66,
+  "val_bh_sharpe": 0.217,
+  "plan_sha256": "82602bdd44c1797b167933a11fe610c823d14ef2133ef9eed99a742a59ae644a",
+  "frozen_before_test": true
+}

@@ -6,8 +6,9 @@ from src import config, labels
 from src.features import FEATURE_COLS, build_features
 
 
-def build_dataset(raw: pd.DataFrame, label_kind: str = "close",
-                  buy_thr=config.BUY_THR, sell_thr=config.SELL_THR) -> pd.DataFrame:
+def build_dataset(
+    raw: pd.DataFrame, label_kind: str = "close", buy_thr=config.BUY_THR, sell_thr=config.SELL_THR
+) -> pd.DataFrame:
     """Return one row per trading day with FEATURE_COLS, r_fwd and label.
 
     label_kind: "close" -> Close(t+5)/Close(t)-1 (project brief, primary)
@@ -26,3 +27,10 @@ def build_dataset(raw: pd.DataFrame, label_kind: str = "close",
     out["r_fwd"] = r
     out["label"] = labels.to_class(r, buy_thr, sell_thr)
     return out.dropna(subset=FEATURE_COLS)
+
+
+def build_dataset_v2(raw: pd.DataFrame) -> pd.DataFrame:
+    """v2 modelling table: same features and +/-1% classes, but the primary label is
+    execution-aligned (config.V2_LABEL_KIND). It reads one bar further ahead than
+    close->close, so v2 segments and CV must use gap=config.V2_GAP, not config.GAP."""
+    return build_dataset(raw, label_kind=config.V2_LABEL_KIND)

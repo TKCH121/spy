@@ -18,8 +18,7 @@ def download_snapshot(ticker: str = config.TICKER) -> Path:
     """
     import yfinance as yf
 
-    df = yf.download(ticker, start=config.START, end=config.END,
-                     auto_adjust=True, progress=False)
+    df = yf.download(ticker, start=config.START, end=config.END, auto_adjust=True, progress=False)
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = df.columns.get_level_values(0)
     df = df[OHLCV]

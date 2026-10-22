@@ -34,7 +34,7 @@ def test_test_hidden_by_default(ds):
 
 def test_train_val_combined_ends_before_test(ds):
     tv = train_val_combined(ds)
-    test_start = ds.loc[config.TEST[0]:].index.min()
+    test_start = ds.loc[config.TEST[0] :].index.min()
     assert ds.index.get_loc(tv.index.max()) + config.HORIZON < ds.index.get_loc(test_start)
 
 

@@ -1,0 +1,17 @@
+{
+  "model": "LR",
+  "default": "cash",
+  "params": {
+    "clf__C": 0.014618962793704957
+  },
+  "label": "\u00b11% open(t+1)\u2192open(t+6)",
+  "gap": 6,
+  "hurdle": 0.003,
+  "mu_note": "class means re-estimated on the training rows of every fit",
+  "val_sharpe_excess": 0.207,
+  "val_final_value": 105397.32,
+  "val_bh_sharpe_excess": 0.166,
+  "schedule": "weekly",
+  "frozen_before_test": true,
+  "plan_sha256": "82602bdd44c1797b167933a11fe610c823d14ef2133ef9eed99a742a59ae644a"
+}

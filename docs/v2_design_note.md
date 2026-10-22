@@ -54,4 +54,6 @@ Same environment as v1 (`requirements.txt`). Seeds fixed through `config.SEED`. 
 
 ## Deviations
 
-_None yet. Add dated entries here: what changed, why, and whether results had been seen._
+_Add dated entries here: what changed, why, and whether results had been seen._
+
+- **2026-10-22 — C1 clarified: the open label needs a gap of 6.** The label for day t reads Open(t+6), one bar further ahead than close→close. With v1's gap of 5, the last label in each segment and CV fold reads the first open of the next one. All v2 splits therefore use `config.V2_GAP` (6), for both segments and `TimeSeriesSplit`. This also means v1's E13 (open→open, run with gap 5) had a one-bar overlap at each boundary. v1 is frozen and is left as is. No v2 results existed when this was written.

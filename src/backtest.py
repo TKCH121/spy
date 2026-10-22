@@ -12,7 +12,7 @@ from src import config
 # --- turning class probabilities into actions --------------------------------
 
 
-def apply_rule(proba: pd.DataFrame, margin: float = None) -> pd.Series:
+def apply_rule(proba: pd.DataFrame, margin: float | None = None) -> pd.Series:
     """proba columns = [-1, 0, 1].
     margin=None -> argmax class.
     margin=m    -> Buy if P(Buy)-P(Sell) > m, Sell if P(Sell)-P(Buy) > m, else Hold."""
@@ -42,10 +42,15 @@ def to_positions(actions: pd.Series, long_short: bool = False, min_hold: int = 0
 # --- backtest -----------------------------------------------------------------
 
 
-def run_backtest(positions: pd.Series, prices: pd.DataFrame, fees: float = config.FEES,
-                 slippage: float = config.SLIPPAGE, init_cash: float = config.INIT_CASH):
+def run_backtest(
+    positions: pd.Series,
+    prices: pd.DataFrame,
+    fees: float = config.FEES,
+    slippage: float = config.SLIPPAGE,
+    init_cash: float = config.INIT_CASH,
+):
     """positions indexed by signal date t (1 long, 0 flat, -1 short). Executed at Open(t+1)."""
-    prices = prices.loc[positions.index.min():positions.index.max()]
+    prices = prices.loc[positions.index.min() : positions.index.max()]
     target = positions.reindex(prices.index).shift(1).fillna(0)  # act on next bar
     prev = target.shift(1).fillna(0)
     entries = (target == 1) & (prev != 1)
@@ -53,20 +58,38 @@ def run_backtest(positions: pd.Series, prices: pd.DataFrame, fees: float = confi
     short_entries = (target == -1) & (prev != -1)
     short_exits = (target != -1) & (prev == -1)
     return vbt.Portfolio.from_signals(
-        close=prices["Close"], price=prices["Open"],
-        entries=entries, exits=exits, short_entries=short_entries, short_exits=short_exits,
-        fees=fees, slippage=slippage, init_cash=init_cash, freq="1D")
+        close=prices["Close"],
+        price=prices["Open"],
+        entries=entries,
+        exits=exits,
+        short_entries=short_entries,
+        short_exits=short_exits,
+        fees=fees,
+        slippage=slippage,
+        init_cash=init_cash,
+        freq="1D",
+    )
 
 
-def buy_and_hold(prices: pd.DataFrame, fees: float = config.FEES,
-                 slippage: float = config.SLIPPAGE, init_cash: float = config.INIT_CASH):
+def buy_and_hold(
+    prices: pd.DataFrame,
+    fees: float = config.FEES,
+    slippage: float = config.SLIPPAGE,
+    init_cash: float = config.INIT_CASH,
+):
     """Benchmark: buy at the first open of the period, hold to the end."""
     entries = pd.Series(False, index=prices.index)
     entries.iloc[0] = True
     return vbt.Portfolio.from_signals(
-        close=prices["Close"], price=prices["Open"], entries=entries,
-        exits=pd.Series(False, index=prices.index), fees=fees, slippage=slippage,
-        init_cash=init_cash, freq="1D")
+        close=prices["Close"],
+        price=prices["Open"],
+        entries=entries,
+        exits=pd.Series(False, index=prices.index),
+        fees=fees,
+        slippage=slippage,
+        init_cash=init_cash,
+        freq="1D",
+    )
 
 
 def summarize(pf, name: str = "") -> dict:
@@ -90,7 +113,7 @@ def summarize(pf, name: str = "") -> dict:
         "sharpe": round(float(sharpe), 3),
         "max_drawdown": round(float(dd), 4),
         "calmar": round(float(cagr / abs(dd)), 3) if dd < 0 else np.nan,
-        "n_orders": int(len(orders)),
+        "n_orders": len(orders),
         "n_trades": int(pf.trades.count()),
         "exposure": round(float((pos_value > 0).mean()), 3),
         "total_fees": round(float(orders["Fees"].sum()) if len(orders) else 0.0, 2),

@@ -55,14 +55,26 @@ def baselines() -> dict:
 def make_pipeline(name: str, class_weight="balanced", smote: bool = False):
     """Candidate Pipelines M1-M3. Scaling only for the linear model."""
     if name == "LR":
-        steps = [("scale", StandardScaler()),
-                 ("clf", LogisticRegression(max_iter=5000, class_weight=class_weight))]
+        steps = [
+            ("scale", StandardScaler()),
+            ("clf", LogisticRegression(max_iter=5000, class_weight=class_weight)),
+        ]
     elif name == "RF":
-        steps = [("clf", RandomForestClassifier(n_estimators=300, class_weight=class_weight,
-                                                n_jobs=-1, random_state=config.SEED))]
+        steps = [
+            (
+                "clf",
+                RandomForestClassifier(
+                    n_estimators=300, class_weight=class_weight, n_jobs=-1, random_state=config.SEED
+                ),
+            )
+        ]
     elif name == "HGB":
-        steps = [("clf", HistGradientBoostingClassifier(class_weight=class_weight,
-                                                        random_state=config.SEED))]
+        steps = [
+            (
+                "clf",
+                HistGradientBoostingClassifier(class_weight=class_weight, random_state=config.SEED),
+            )
+        ]
     else:
         raise ValueError(name)
     if smote:
@@ -88,11 +100,26 @@ SEARCH_SPACES = {
 }
 
 
-def tune(name: str, X: pd.DataFrame, y: pd.Series, cv, n_iter: int = 25, **pipe_kwargs):
-    """RandomizedSearchCV over the whole Pipeline with time-series CV, scored by macro-F1."""
+def tune(
+    name: str,
+    X: pd.DataFrame,
+    y: pd.Series,
+    cv,
+    n_iter: int = 25,
+    scoring: str = "f1_macro",
+    **pipe_kwargs,
+):
+    """RandomizedSearchCV over the whole Pipeline with time-series CV, scored by macro-F1
+    (v1) or, for v2, by `scoring="neg_log_loss"` (docs/v2_design_note.md, C5)."""
     search = RandomizedSearchCV(
-        make_pipeline(name, **pipe_kwargs), SEARCH_SPACES[name], n_iter=n_iter,
-        scoring="f1_macro", cv=cv, random_state=config.SEED, n_jobs=-1, refit=True,
+        make_pipeline(name, **pipe_kwargs),
+        SEARCH_SPACES[name],
+        n_iter=n_iter,
+        scoring=scoring,
+        cv=cv,
+        random_state=config.SEED,
+        n_jobs=-1,
+        refit=True,
         return_train_score=True,
     )
     search.fit(X, y)

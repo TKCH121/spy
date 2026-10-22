@@ -1,0 +1,24 @@
+{
+  "candidate": "C3-L",
+  "treatment": "C3",
+  "default": "long",
+  "model": "HGB",
+  "params": {
+    "clf__l2_regularization": 0.17336465350777208,
+    "clf__learning_rate": 0.032268708256236636,
+    "clf__max_depth": 3,
+    "clf__max_iter": 51,
+    "clf__min_samples_leaf": 153
+  },
+  "label": "\u00b11% open(t+1)\u2192open(t+6)",
+  "gap": 6,
+  "hurdle": 0.003,
+  "refit": "every January on labelled rows from 2006 whose labels end before the year (last 6 rows dropped)",
+  "dev_sharpe_excess": 0.708,
+  "dev_final_value": 316843.58,
+  "dev_bh_sharpe_excess": 0.708,
+  "dev_bh_final_value": 316843.58,
+  "calibration_passed": false,
+  "design_note_sha256": "8149938bb8fcd9d471f17d406da2c0170fb9f473d1459ce296a57a162d939fb0",
+  "frozen_before_any_2023_row_scored": true
+}

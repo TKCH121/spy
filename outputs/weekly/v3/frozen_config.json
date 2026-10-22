@@ -1,0 +1,16 @@
+{
+  "version": "v3w",
+  "candidate": "C3-L",
+  "treatment": "C3",
+  "default": "long",
+  "model": "LR",
+  "params": {
+    "clf__C": 0.014618962793704957
+  },
+  "schedule": "weekly",
+  "dev_sharpe_excess": 0.708,
+  "dev_bh_sharpe_excess": 0.708,
+  "calibration_passed": false,
+  "plan_sha256": "82602bdd44c1797b167933a11fe610c823d14ef2133ef9eed99a742a59ae644a",
+  "frozen_before_test": true
+}

@@ -10,8 +10,10 @@ from src.labels import (
 
 
 def test_forward_return_and_classes():
-    close = pd.Series([100, 101, 102, 103, 104, 102.0, 99, 98, 110, 111, 112],
-                      index=pd.bdate_range("2020-01-01", periods=11))
+    close = pd.Series(
+        [100, 101, 102, 103, 104, 102.0, 99, 98, 110, 111, 112],
+        index=pd.bdate_range("2020-01-01", periods=11),
+    )
     r = forward_return(close, 5)
     assert np.isclose(r.iloc[0], 102 / 100 - 1)  # +2.0% -> Buy
     assert np.isclose(r.iloc[1], 99 / 101 - 1)  # -1.98% -> Sell
