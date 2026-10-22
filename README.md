@@ -1,76 +1,70 @@
-# Can a computer beat “buy and wait”? — SPY trading signal model (Module 3, Group 7)
+# SPY weekly Buy / Hold / Sell model — Module 3, Group 7
 
-A machine-learning model predicts the best action for SPY (the S&P 500 fund) over the next 5 trading days: **Buy** (expected rise > 1%), **Sell** (fall > 1%) or **Hold**. A backtest trades on those predictions, and the result is compared with simply buying and holding. Every version acts on a fresh prediction each day. A weekly schedule (one decision each Friday, the brief's literal reading) is tested as well. The project is graded on **methodology, code quality and interpretation**, not profit. Everything below is built to be leakage-free and honestly tested.
+A machine-learning classifier predicts the best action for SPY (the S&P 500 ETF) over the next 5 trading days: **Buy** (return > +1%), **Sell** (< −1%) or **Hold**. The trading strategy acts on it **once a week**: after the week's last close it takes the prediction, trades at the next open, and holds for the week. Results are compared with buying and holding, on return and on risk. The project is graded on methodology, code quality and interpretation, so everything is built to be leakage-free and tested honestly.
 
 ## The answer in three lines
 
-1. **Every version lost to Buy & Hold, on return and on risk-adjusted return.** On 2023–24, with cash earning T-bills, $100,000 became **$156,546** by buying and waiting (Sharpe 1.43, worst fall −10.0%). v1 made **$129,069** (0.85, −9.4%) and v2 **$121,812** (0.59, −10.0%). v3's best rule **never traded**, so it equals Buy & Hold.
-2. **The model can tell how big next week's move will be, not which way.** It beats guessing as a classifier (test macro-F1 0.41 vs 0.31), but has no usable timing skill: v2 beat only 26% of 1,000 random traders.
-3. **Why, in one sentence:** predicting next week's direction of the world's most-watched fund from its own public prices leaves almost no signal, and every day out of a rising market costs money. Full write-up: **[outputs/SUMMARY.md](outputs/SUMMARY.md)**.
+1. **Buy & Hold won, on return and on risk-adjusted return.** On 2023–24 (cash earning T-bills), $100,000 became **$156,546** by buying and holding (Sharpe 1.43, max drawdown −10.0%). v1w made **$126,864** (0.76, −9.7%). v2w made **$110,453**: it stayed in cash. v3w **never sold**, so it equals Buy & Hold.
+2. **The model predicts the size of next week's move, not its direction.** It beats guessing as a classifier (macro-F1 about 0.40 vs 0.32), but has no usable timing skill.
+3. **Why:** next week's direction for the world's most-watched fund, from its own public prices, carries almost no signal, and every week out of a rising market costs money. Full write-up: **[outputs/SUMMARY.md](outputs/SUMMARY.md)**.
 
-## Versions at a glance
+## Versions
 
-| | Model | Key change | Test accuracy / macro-F1 | $100,000 on 2023–24 | Max drawdown | Sharpe | Report |
-|---|---|---|---|---|---|---|---|
-| **v1** (Peter Li) | Random forest | The brief's baseline project | 44.9% / 0.408 | $129,069 ($123,714 as built, cash at 0%) | −9.4% | 0.85 | [outputs/report.md](outputs/report.md) |
-| **v2** | Gradient boosting | Uses all three probabilities in an expected-return rule; selects by money, not score; cash earns T-bills | 40.9% / 0.376 | $121,812 | −10.0% | 0.59 | [outputs/v2/report.md](outputs/v2/report.md) |
-| **v3** | Gradient boosting + calibrated odds | Corrects the odds that class weighting inflates | 48.4% / 0.349 | $156,546 (never trades) | −10.0% | 1.43 | [outputs/v3/report.md](outputs/v3/report.md) |
-| Buy & Hold | — | — | — | **$156,546** | −10.0% | **1.43** | — |
+| | Model | Key change | Test accuracy / macro-F1 | $100,000 on 2023–24 | Max drawdown | Sharpe |
+|---|---|---|---|---|---|---|
+| **v1w** (v1 by Peter Li) | Random forest | The brief's baseline design, deciding weekly | 44.9% / 0.408 | $126,864 | −9.7% | 0.76 |
+| **v2w** | Logistic regression | Expected-return rule over all three probabilities; model and rule chosen together by money; cash earns T-bills | 45.4% / 0.404 | $110,453 (all cash) | 0.0% | — |
+| **v3w** | Calibrated logistic regression | Corrects the odds that class weighting inflates | 48.2% / 0.339 | $156,546 (never sells) | −10.0% | 1.43 |
+| Buy & Hold | — | — | — | **$156,546** | −10.0% | **1.43** |
 
-All four rows are on one basis: costs included, cash earning the T-bill rate, and Sharpe measured over T-bills. Volatility, Calmar, the 12-year walk-forward and the 2025–26 holdout are in the [scorecard](outputs/SUMMARY.md#scorecard-return-and-risk-on-one-basis-notebook).
-
-v2 and v3 predict an execution-aligned label (open → open), so their scores are not exactly comparable with v1's. v3's accuracy is higher, but only because calibrated odds call the common "flat" weeks more often. Its macro-F1 is the lowest.
-
-**One decision a week** ([report](outputs/weekly/report.md)): after Friday's close, predict for the next 5 days, trade at Monday's open, and hold all week. This uses the same frozen models and roughly halves trading costs: on 2023–24, v1 makes $129,705 and v2 $123,834. The conclusion doesn't change. It is a sensitivity check, decided after the test results were known.
+All rows are on one basis: costs included, cash earning the T-bill rate, and Sharpe over T-bills. The [scorecard](notebooks/scorecard.ipynb) adds volatility, Calmar, the 12-year walk-forward, the 2025–26 holdout, and the original **daily-decision** versions for comparison (v1 $129,069, v2 $121,812, v3 $156,546). v1–v3 were first built with daily decisions; [docs/weekly_rebuild_note.md](docs/weekly_rebuild_note.md) is the plan, written before the rebuild ran, for rebuilding each one weekly.
 
 ## For assessors: where each deliverable is
 
 | The brief asks for | Open | Look at |
 |---|---|---|
 | **EDA notebook** | [notebooks/01_eda.ipynb](notebooks/01_eda.ipynb) | Feature distributions (§4), indicator correlations (§5), target class balance (§6) |
-| **Modelling notebook** (pipeline, features, training, tuning) | [notebooks/02_modeling.ipynb](notebooks/02_modeling.ipynb) | Time-ordered splits with gaps (§1), baselines (§3), tuned candidates in sklearn Pipelines (§4), selection rules (§7–8), one-time test (§9). The feature formulas are in [src/features.py](src/features.py). |
-| **Realistic backtest** with fees, vs Buy & Hold | [notebooks/03_backtest.ipynb](notebooks/03_backtest.ipynb) | vectorbt, 0.10% fee + 0.05% slippage per side, fills at the next open, equity vs Buy & Hold (§1), fee sensitivity (§2) |
-| **Lessons learned** | [outputs/report.md](outputs/report.md) (v1) · [outputs/SUMMARY.md](outputs/SUMMARY.md) (all versions) | Where the model failed, why it lost, why markets are hard |
-| **No look-ahead bias** | [tests/](tests/) (50 tests, run in CI) | Features unchanged when future data is cut or shocked; labels and splits never cross boundaries; no fit reads labels after its window |
-| **Class imbalance** | `02_modeling` §4 (E04–E08), [outputs/v3/calibration_report.md](outputs/v3/calibration_report.md) | Class weights vs SMOTE vs none, and what weighting does to the odds |
-| Beyond the brief | `v2_02_modeling`, `v3_01…03`, [docs/](docs/) | Two improved versions, each designed (and, for v3, fingerprinted) before any code was written |
-| **Return and risk scorecard** | [notebooks/scorecard.ipynb](notebooks/scorecard.ipynb) | Every version and schedule on one basis: final value, annual return, volatility, max drawdown, Sharpe, Calmar, costs, time invested |
-| Weekly decisions (the brief's literal "next 5 days") | [notebooks/weekly_decisions.ipynb](notebooks/weekly_decisions.ipynb) | Every version re-run with one Buy/Hold/Sell decision per week |
+| **Modelling notebook** (pipeline, features, training, tuning) | [notebooks/02_modeling.ipynb](notebooks/02_modeling.ipynb) | Time-ordered splits with gaps (§1), baselines (§3), tuned candidates in sklearn Pipelines (§4), selection (§7–8), one-time test (§9). The feature formulas are in [src/features.py](src/features.py). |
+| **Realistic backtest** with fees, vs Buy & Hold | [notebooks/03_backtest.ipynb](notebooks/03_backtest.ipynb) (v1) · [notebooks/weekly_v1.ipynb](notebooks/weekly_v1.ipynb)–[v3](notebooks/weekly_v3.ipynb) (weekly) · [scorecard](notebooks/scorecard.ipynb) | 0.10% fee + 0.05% slippage per side, fills at the next open, equity vs Buy & Hold, risk metrics |
+| **Lessons learned** | [outputs/SUMMARY.md](outputs/SUMMARY.md) · [outputs/weekly/report.md](outputs/weekly/report.md) · [outputs/report.md](outputs/report.md) (v1) | Where the models failed, why they lost, why markets are hard |
+| **No look-ahead bias** | [tests/](tests/) (51 tests, run in CI) | Features unchanged when future data is cut or shocked; labels and splits never cross boundaries; no fit reads labels after its window |
+| **Class imbalance** | `02_modeling` §4 (E04–E08) · [outputs/v3/calibration_report.md](outputs/v3/calibration_report.md) | Class weights vs SMOTE vs none, and what weighting does to the predicted odds |
 
-**Suggested reading order (about 20 minutes):** this page → [outputs/SUMMARY.md](outputs/SUMMARY.md) → notebooks `01` → `02` → `03` → the v2 and v3 reports. The slides are in [presentation/](presentation/).
+**Suggested reading order (about 20 minutes):** this page → [outputs/SUMMARY.md](outputs/SUMMARY.md) → notebooks `01` → `02` → `03` → [outputs/weekly/report.md](outputs/weekly/report.md). The slides are in [presentation/](presentation/).
 
 ## Methodology guardrails
 
-- **Timing:** each prediction is made after the close of day *t*, and the trade fills at the open of *t+1*.
-- **Splits:** Train 2010–2020 / Validation 2021–2022 / Test 2023–2024, never shuffled. Rows whose label window would cross a boundary are dropped: 5 rows for v1's close→close label, 6 for v2/v3's open→open label. Tuning uses `TimeSeriesSplit` with the same gap.
+- **Timing:** the decision is made after the week's last close and filled at the next open. Models learn from every trading day's 5-day outcome.
+- **Splits:** Train 2010–2020 / Validation 2021–2022 / Test 2023–2024, never shuffled. Rows whose label window would cross a boundary are dropped: 5 rows for the close→close label, 6 for the open→open label. Tuning uses `TimeSeriesSplit` with the same gap.
 - **Preprocessing:** all scaling and resampling sit inside sklearn/imblearn Pipelines and are fit on each training fold only.
-- **Selection rules stated before results:** v1 in [docs/](docs/); v2 in [docs/v2_design_note.md](docs/v2_design_note.md); v3 in [docs/v3_design_note.md](docs/v3_design_note.md), with its SHA-256. Each test period is opened once, after freezing. Later changes are logged as dated deviations.
-- **Evidence, not one number:** a 12-year walk-forward with yearly refits, block-bootstrap confidence intervals, a 1,000-path random-timing benchmark with matched exposure, and cash earning T-bill interest (one basis for every version in the scorecard).
+- **Decisions written down before results:** v1 plan in [docs/](docs/); [v2 design note](docs/v2_design_note.md); [v3 design note](docs/v3_design_note.md) and [weekly rebuild plan](docs/weekly_rebuild_note.md), both with SHA-256. Each test was opened once per design, and later changes are logged as dated deviations.
+- **Evidence beyond one number:** risk metrics, a 1,000-path random-timing benchmark with matched exposure, block-bootstrap intervals, a 12-year walk-forward with yearly refits, and cash earning T-bill interest.
 
 ## Repository layout
 
 ```text
 README.md                 this page
-outputs/SUMMARY.md        lessons learned across v1–v3
-docs/                     v1 plan (EN / 中文), v2 and v3 design notes, v2 work items
+outputs/SUMMARY.md        lessons learned and the scorecard
+docs/                     v1 plan (EN / 中文), v2 and v3 design notes, weekly rebuild plan
 notebooks/
-  01_eda.ipynb                     v1 · exploratory analysis
-  02_modeling.ipynb                v1 · pipeline, baselines, tuning, selection, one-time test
-  03_backtest.ipynb                v1 · vectorbt backtest vs Buy & Hold
-  04_strategy_research.ipynb       v1 follow-up research · 9 pre-registered strategies, 2013–2022
-  05_holdout_2025.ipynb            v1 follow-up research · 2025-01 → 2026-10 holdout
-  v2_02_modeling.ipynb             v2 · expected-return rule, joint selection, test, evidence, walk-forward
-  v3_01_calibration.ipynb          v3 · do the corrected odds match reality? (no trading)
-  v3_02_development_and_freeze.ipynb  v3 · 2013–2022 selection and freeze
-  v3_03_test_and_holdout.ipynb     v3 · 2023–24 and the 2025–26 holdout
-  weekly_decisions.ipynb           all versions · one decision per week (sensitivity check)
-  scorecard.ipynb                  all versions · return and risk on one basis
+  01_eda.ipynb                        v1 · exploratory analysis
+  02_modeling.ipynb                   v1 · pipeline, baselines, tuning, selection, one-time test
+  03_backtest.ipynb                   v1 · vectorbt backtest vs Buy & Hold (daily decisions)
+  04_strategy_research.ipynb          v1 follow-up research · 9 pre-registered strategies
+  05_holdout_2025.ipynb               v1 follow-up research · 2025–26 holdout
+  v2_02_modeling.ipynb                v2 (daily) · expected-return rule, selection, test, walk-forward
+  v3_01_calibration.ipynb             v3 · do the corrected odds match reality? (no trading)
+  v3_02_development_and_freeze.ipynb  v3 (daily) · 2013–22 selection and freeze
+  v3_03_test_and_holdout.ipynb        v3 (daily) · 2023–24 and the 2025–26 holdout
+  weekly_decisions.ipynb              the frozen daily models run on a weekly schedule
+  weekly_v1.ipynb … weekly_v3.ipynb   v1w, v2w, v3w · rebuilt with weekly decisions
+  scorecard.ipynb                     every strategy · return and risk on one basis
 src/
-  config.py      every design constant (dates, thresholds, costs, gaps)
+  config.py      design constants (dates, thresholds, costs, gaps)
   data.py        download / load the price snapshot
   features.py    the 15 strictly-lagged features
   labels.py      forward returns and classes (the only module allowed to look ahead)
-  dataset.py     features + labels table (v1 and v2 labels)
+  dataset.py     features + labels table (close→close and open→open labels)
   split.py       time-ordered segments with gaps, TimeSeriesSplit CV
   models.py      baselines, Pipelines, search spaces, tuning
   evaluate.py    classification metrics, experiment log
@@ -78,17 +72,17 @@ src/
   research.py    v1 follow-up research: walk-forward refits, weight strategies
   v2.py          expected-return rule, T-bill cash simulator, random timing, bootstrap
   v3.py          probability calibration treatments and their walk-forward
-  weekly.py      one-decision-a-week schedule (Friday close → Monday open)
-tests/           look-ahead, label, split, v2 strategy, v3 calibration and weekly tests (pytest)
-outputs/         v1 results and report · research/ · v2/ · v3/ · weekly/
+  weekly.py      the weekly decision schedule
+tests/           51 tests: look-ahead, labels, splits, strategies, calibration, weekly schedule
+outputs/         v1 results · research/ · v2/ · v3/ · weekly/ (incl. v1–v3 rebuilds) · scorecard.json
 data/            raw/ price and T-bill snapshots · holdout/ 2025–26 data
-presentation/    slide deck, 10-minute script, build files
+presentation/    slide deck, speaking notes, build files
 knowledge&docs/  course materials and project brief (read-only)
 ```
 
 ## Reproduce
 
-Python 3.11 with the pinned `requirements.txt`. The data snapshots are committed, so everything runs offline except `05_holdout_2025`, which downloads data. A full run takes a few minutes.
+Python 3.11 with the pinned `requirements.txt`. The data snapshots are committed, so everything runs offline except `05_holdout_2025`, which downloads data.
 
 ```bash
 conda create -y -n spy-m3 python=3.11
@@ -107,11 +101,11 @@ conda run -n spy-m3 python -m pytest -q
 ```
 
 ```bash
-cd notebooks && for n in 01_eda 02_modeling 03_backtest 04_strategy_research 05_holdout_2025 v2_02_modeling v3_01_calibration v3_02_development_and_freeze v3_03_test_and_holdout weekly_decisions scorecard; do conda run -n spy-m3 jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.kernel_name=spy-m3 $n.ipynb; done
+cd notebooks && for n in 01_eda 02_modeling 03_backtest 04_strategy_research 05_holdout_2025 v2_02_modeling v3_01_calibration v3_02_development_and_freeze v3_03_test_and_holdout weekly_decisions weekly_v1 weekly_v2 weekly_v3 scorecard; do conda run -n spy-m3 jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.kernel_name=spy-m3 $n.ipynb; done
 ```
 
 Code style is checked with `ruff check src tests` and `ruff format --check src tests` (config in `ruff.toml`). On some Windows setups, pytest needs `--basetemp` pointing to a writable folder.
 
 ## Credits
 
-**v1**, including the follow-up research in notebooks 04–05, was built by **Peter Li**, originally in [TKCH121/module3-machine-learningPL](https://github.com/TKCH121/module3-machine-learningPL). Its git history is kept here unchanged, tagged [`v1`](../../tree/v1). **v2 and v3** are the group's revisions. A Chinese summary of v1 is in [outputs/report_CN.md](outputs/report_CN.md).
+**v1**, including the follow-up research in notebooks 04–05, was built by **Peter Li**, originally in [TKCH121/module3-machine-learningPL](https://github.com/TKCH121/module3-machine-learningPL). Its git history is kept here unchanged, tagged [`v1`](../../tree/v1). **v2, v3 and the weekly rebuild** are the group's revisions. A Chinese summary of v1 is in [outputs/report_CN.md](outputs/report_CN.md).
