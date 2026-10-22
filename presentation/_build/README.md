@@ -11,7 +11,7 @@
 ## Inputs
 
 - `v1_money_paths.json` (this folder)
-- `outputs/v2/results.json` (from `notebooks/v2_02_modeling.ipynb`) , `outputs/weekly/results.json` (from `notebooks/weekly_decisions.ipynb`) and `outputs/scorecard.json` (from `notebooks/scorecard.ipynb`).
+- `outputs/v2/results.json` (from `notebooks/v2_02_modeling.ipynb`), `outputs/weekly/results.json` (from `notebooks/weekly_decisions.ipynb`) and `outputs/scorecard.json` (from `notebooks/scorecard.ipynb`).
 - v3's numbers are typed into the script from `outputs/v3/calibration_report.md` and `development_report.md` (PRs #4, #5).
 
 ## Commands
