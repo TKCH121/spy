@@ -1,291 +1,148 @@
 # Presentation script — Can a computer beat “buy and wait”?
 
-Module 3 Group 7 · goes with `SPY_Model_Presentation.pptx` (27 slides) · about 42 minutes plus questions.
+Module 3 Group 7 · goes with `SPY_Model_Presentation.pptx` (28 slides) · **about 9 minutes of speaking**, plus clicks and questions.
 
-Read it in your own words rather than word for word. Replace anything in [square brackets] before presenting.
+**Speak** slides carry the deliverables the brief grades. **Flash** slides get one line. **Skip** slides are there as backup for questions: click past them. Say it in your own words. Fill in the presenter names and date on slide 1.
 
-**Short on time?** Skipping slides 3 (glossary), 7 (the 15 measurements), 11 (random forest explained), 13 (trading rule), 17 (how we judge v2), 19 (twelve years) and 23 (v3 development detail) brings it to about 29 minutes. The story still holds: question → v1 result → why it lost → v2 → v3 → honesty → lessons. For about 20 minutes, also skip 6, 8 and 20 and cover their points in one sentence each.
+| Slide | Title | Tier | Time |
+|---|---|---|---|
+| 1 | Cover | Speak | 20 s |
+| 2 | What we delivered | Speak | 40 s |
+| 3 | The question in one picture | Flash | 10 s |
+| 4 | Five words you’ll hear today | Skip | — |
+| 5 | The answer: buy-and-wait won by $32,832 | Speak | 25 s |
+| 6 | The two-year journey of $100,000 | Flash | 10 s |
+| 7 | How the model makes a decision, every evening | Speak | 25 s |
+| 8 | What the model looks at: 15 measurements | Speak | 20 s |
+| 9 | What the model predicts: what kind of week is next | Speak | 25 s |
+| 10 | No cheating: textbook, practice exam, final exam | Speak | 45 s |
+| 11 | Choosing the model: the random forest scored best | Speak | 30 s |
+| 12 | What a random forest is, and why it won | Skip | — |
+| 13 | Final exam: good at spotting calm weeks, not direction | Speak | 25 s |
+| 14 | Turning predictions into trades (v1’s rule) | Flash | 15 s |
+| 15 | Where the $32,832 went | Speak | 35 s |
+| 16 | The real problem (statement) | Speak | 20 s |
+| 17 | What version 2 changes | Speak | 20 s |
+| 18 | How we’ll know if it really works | Skip | — |
+| 19 | Version 2 results: $100,000, 2023–2024 | Speak | 25 s |
+| 20 | Twelve years, one year at a time | Flash | 10 s |
+| 21 | Why version 2 still lost | Skip | — |
+| 22 | Class imbalance: good for predictions, bad for odds | Speak | 35 s |
+| 23 | Version 3: correct the odds first | Speak | 20 s |
+| 24 | With honest odds, the best rule is: don’t trade | Speak | 20 s |
+| 25 | How we kept the test honest | Speak | 25 s |
+| 26 | A flaw of machine learning, or of the question? | Speak | 25 s |
+| 27 | What we learned | Speak | 20 s |
+| 28 | Questions (closing) | Flash | 10 s |
 
-## Slide 1 · Cover (~1 minute)
+## 1. Cover (~20 s)
 
-Hi everyone, we’re Group 7. You don’t need any finance background for this talk — we’ll explain every term as we go.
+We’re Group 7. Our question: with $100,000 in the US stock market, can a machine-learning model that decides each day whether to be in or out beat simply buying and waiting? The brief grades method, not profit, so we’ll show what we built and how we tested it.
 
-Our question is simple: if you had $100,000 to invest in the US stock market, could a computer model that decides every day when to be in and when to be out do better than just buying once and waiting?
+## 2. What we delivered (~40 s)
 
-Spoiler: it didn’t. But the assignment isn’t graded on making money — it’s graded on building the model correctly and explaining why it won or lost. That’s what this talk is about.
+Here’s everything the brief asked for and where to find it. An exploratory notebook on the features and the class balance. A modelling notebook with lagged features, time-ordered splits and tuning. A realistic backtest with fees and slippage, plotted against Buy & Hold. And a lessons-learned report. On top of that, two improved versions, each planned before any code was written. Throughout, 46 automated tests check that nothing sees the future.
 
-Version 1 of the model was built by Peter Li; versions 2 and 3 are the group’s improvements on it.
+## 3. The question in one picture · flash, one line (~10 s)
 
-## Slide 2 · The question in one picture (~1 minute)
+Option A: buy once and wait. Option B: the model decides every day, and pays a fee each time it switches.
 
-Here’s the whole project in one picture.
+## 4. Five words you’ll hear today · skip: click past
 
-Option A: on the first trading day of 2023 you put $100,000 into the US stock market and simply leave it there for two years. Finance people call this “Buy & Hold”. It’s our yardstick — the thing to beat.
+_Backup if the audience needs the terms: SPY, Buy & Hold, backtest, trading cost, drawdown._
 
-Option B: a computer model looks at recent market data every evening and decides whether your money should be in the market tomorrow or sitting in cash. Each time it switches, you pay a small fee, just as you would with a real broker.
+## 5. The answer: buy-and-wait won by $32,832 (~25 s)
 
-The question is: which one ends 2024 with more money? Before we tell you, a few words you’ll need.
+The answer up front, on the 2023–24 test period: $100,000 left alone grew to $156,546. Our model grew it to $123,714, about $32,832 less, and paid $3,237 in trading costs. The brief expected this; the rest explains why.
 
-## Slide 3 · Five words you’ll hear today (~1.5 minutes)
+## 6. The two-year journey of $100,000 · flash, one line (~10 s)
 
-Five terms, and that’s all the finance you need.
+Note the flat orange stretch: the model sat in cash from December 2023 to April 2024 while the market rose about 14%.
 
-SPY is a single fund that owns the 500 biggest US companies — Apple, Microsoft and so on. When the US market goes up, SPY goes up.
+## 7. How the model makes a decision, every evening (~25 s)
 
-Buy & Hold means buying once and never selling.
+Every evening the model measures the market, predicts next week as up, down or flat, turns that into “in the market or in cash”, and trades at the next morning’s price. Deciding after the close and trading next morning means it never trades at a price it has already seen.
 
-A backtest is how we test a trading idea without real money: we replay history one day at a time and let the model trade as if it were live, but it may only use information that existed on that day.
+## 8. What the model looks at: 15 measurements (~20 s)
 
-Trading cost: every time you buy or sell you pay about 0.15% — a broker fee plus a slightly worse price than you hoped. That’s $150 per $100,000 moved.
+The brief asked for returns, at least three technical indicators and a volatility measure, all lagged. We used 15: returns, moving averages, RSI, MACD, Bollinger bands, volatility and volume, each using only data up to that day.
 
-Drawdown is the worst fall from a high point — how bad the worst stretch feels.
+## 9. What the model predicts: what kind of week is next (~25 s)
 
-## Slide 4 · The answer: buy-and-wait won by $32,832 (~1.5 minutes)
+The target uses the brief’s thresholds: up more than 1% in five days is Buy, down more than 1% is Sell, otherwise Hold. Down weeks are rare, about one in five, so the classes are imbalanced. We come back to that on slide 22.
 
-Here’s the answer up front.
+## 10. No cheating: textbook, practice exam, final exam (~45 s)
 
-$100,000 left in the market for 2023 and 2024 grew to about $156,500 — a profit of $56,500.
+This is the core of the brief. No random shuffling: we train on 2010 to 2020, choose the model on 2021–22, lock everything, and only then open 2023–24, once. There’s a one-week buffer between periods, because each label looks a week ahead. Tuning used time-series cross-validation with the same buffer. Our accuracy, about 45%, sits in the range the brief calls normal: no sign of leakage.
 
-The same $100,000 managed by our model grew to about $123,700 — a profit of $23,700. So the model still made money, but $32,800 less than doing nothing.
+## 11. Choosing the model: the random forest scored best (~30 s)
 
-It also paid over $3,200 in trading costs, against $100 for Buy & Hold.
+We started with interpretable models, as the brief asks: logistic regression, random forest and gradient boosting, plus baselines. The rule, set in advance: best practice-exam macro-F1. The random forest won at 0.40; random guessing is about 0.33. Gradient boosting memorised its training data and did worse than guessing.
 
-The assignment told us to expect this, so losing isn’t a failure of the project. The rest of the talk explains how the model works and exactly why it lost.
+## 12. What a random forest is, and why it won · skip: click past
 
-## Slide 5 · The two-year journey of $100,000 (~1.5 minutes)
+_Backup if asked: 300 decision trees vote; voting limits memorising (0.54 on training data vs 0.40 on the practice exam, against 0.74 vs 0.32 for gradient boosting)._
 
-This chart follows the $100,000 day by day. The dark line is Buy & Hold, the orange line is our model.
+## 13. Final exam: good at spotting calm weeks, not direction (~25 s)
 
-For most of 2023 the two lines stay fairly close. Then look at the flat orange stretch from December 2023 to April 2024. The model had moved everything to cash, and it stayed there for four months while the market climbed about 14%. That single decision explains a big part of the gap.
+On the final exam it scored 0.41, the same as on practice. But look where the skill is: it recognises calm weeks well, and mixes up up-weeks and down-weeks almost at random.
 
-Overall, the model was out of the market on about 42% of days. In a market that mostly rose during these two years, being out that often is expensive.
+## 14. Turning predictions into trades (v1’s rule) · flash, one line (~15 s)
 
-## Slide 6 · How the model makes a decision, every evening (~1.5 minutes)
+The trading rule: in the market when the model leans “up”, cash when it leans “down”, otherwise no change. All in or all out.
 
-Every evening the model does four things.
+## 15. Where the $32,832 went (~35 s)
 
-First, it measures 15 things about the recent market — we’ll see them on the next slide.
+Where the money went. One long pause during a rally cost about $15,000. Overall it sat in cash 42% of the time, and those days were just as good as the days it was invested, so stepping out bought nothing. Costs were about $3,200, but even with zero fees it still trailed Buy & Hold. This is the core of our lessons-learned report.
 
-Second, it predicts what kind of week is coming: up more than 1%, down more than 1%, or roughly flat.
+## 16. The real problem (statement) (~20 s)
 
-Third, a simple rule turns that prediction into a decision: be in the market tomorrow, or be in cash.
+The real problem: the model can tell how big next week’s move will be, not which way. And the trading rule only used the “which way” part. Its real skill never reached a trade.
 
-Fourth, if the decision is a change, it buys or sells when the market opens next morning and pays the cost.
+## 17. What version 2 changes (~20 s)
 
-The key rule: the model decides after the close and trades at the next morning’s price. It can never trade at a price it has already seen — that would be cheating.
+Version 2 fixes that. It turns all three predictions into one expected gain, trades only when that beats the cost, and picks the model by money made, not just by prediction score.
 
-## Slide 7 · What the model looks at: 15 measurements (~1.5 minutes)
+## 18. How we’ll know if it really works · skip: click past
 
-These are the 15 measurements, grouped by the question each one answers.
+_Backup if asked: v2 is also judged against 1,000 random traders with the same time in the market, with error bars, and with cash earning T-bill interest._
 
-How much has the price moved over the last day, week, two weeks and month? Is the price above or below its usual level over the last one, two and ten months? Has it risen or fallen unusually fast — the classic “overbought / oversold” signals? How jumpy is the market? And are unusually many people trading?
+## 19. Version 2 results: $100,000, 2023–2024 (~25 s)
 
-The important part is the last line. Every measurement uses only data up to today. We have automated tests that, for example, scramble all future prices and check that none of today’s measurements change. If any measurement were peeking into the future, those tests would fail.
+Version 2 ended with $121,812, no better than version 1. More telling: it beat only 264 of 1,000 random traders who spent the same time in the market. Its timing was no better than luck.
 
-## Slide 8 · What the model predicts: what kind of week is next (~1.5 minutes)
+## 20. Twelve years, one year at a time · flash, one line (~10 s)
 
-The model doesn’t try to predict an exact price. It predicts what kind of week is coming, in three buckets.
+Re-trained every year from 2013 to 2024, it was ahead of Buy & Hold in only two of twelve years.
 
-Say SPY closes at $500 on Monday. If a week later it’s above $505 — up more than 1% — that was an up week. Below $495 is a down week. In between is a flat week.
+## 21. Why version 2 still lost · skip: click past
 
-In our test period, 42% of weeks were flat, 40% up and only 18% down. Because down weeks are rare, we tell the model to give them extra weight, otherwise it would mostly ignore them.
+_Backup if asked: it stepped out too often (in the market about half the time), its down-week odds were inflated, and there was little direction skill underneath._
 
-And the mix changes a lot from year to year: 2017 had almost no down weeks, 2022 had loads. That makes the past an unreliable guide.
+## 22. Class imbalance: good for predictions, bad for odds (~35 s)
 
-## Slide 9 · No cheating: textbook, practice exam, final exam (~1.5 minutes)
+The brief requires handling class imbalance. We used class weights, after testing SMOTE and no weighting in version 1. Balancing makes the model treat all three kinds of week as equally common, which is good for predictions. But it inflates the odds: the model predicted 30% down weeks against 21% in reality. Version 2 used those odds directly, so it kept selling.
 
-This is the part the assignment cares about most: making sure the test is fair.
+## 23. Version 3: correct the odds first (~20 s)
 
-Think of it like school. The model studies from a textbook — eleven years of history, 2010 to 2020. We then give it a practice exam, 2021 and 2022, to choose between different models and trading rules. Once we’ve chosen, everything is locked. Only then do we open the final exam, 2023 and 2024, exactly once.
+Version 3 keeps the weights for training, then corrects the odds. On average that works: 21% predicted vs 21% real. But it failed our own year-by-year test, set in advance, and we report that.
 
-We never shuffle the data, because in real life you can’t learn from the future. And we leave a one-week buffer between periods, because each prediction looks a week ahead and must not peek into the next period.
+## 24. With honest odds, the best rule is: don’t trade (~20 s)
 
-## Slide 10 · Choosing the model: the random forest scored best (~1.5 minutes)
+With honest odds, the rule we chose in advance picked a version that never sold in ten years: it is Buy & Hold. Every version that traded did worse.
 
-We tried seven models on the practice exam, plus random guessing as a baseline.
+## 25. How we kept the test honest (~25 s)
 
-The score is called macro-F1. In plain words, it’s a grade from 0 to 1 for how well a model recognises all three kinds of week — not just the common ones. Random guessing gets about 0.33.
+How we kept it honest: plans written and fingerprinted before any code, each final exam opened once, 46 automated look-ahead tests, and every change or failure logged rather than hidden.
 
-The random forest, in orange, scored 0.40 — the only model clearly above guessing. Several versions of logistic regression, a simpler model, sat just above guessing. Gradient boosting actually did worse than guessing.
+## 26. A flaw of machine learning, or of the question? (~25 s)
 
-It was also consistent: it scored 0.40 when tested on held-back parts of the textbook, and 0.40 again on the practice exam.
+Is this a flaw of machine learning? Mostly it’s the question: predicting next week’s direction for the most-watched fund in the world from its own public prices. Machine learning helps elsewhere, like ranking many stocks or forecasting risk. That’s why our fair bar was beating random timing, not just beating Buy & Hold.
 
-That was our pre-agreed rule — highest practice-exam score wins — so the random forest became the model. The next slide explains what a random forest is.
+## 27. What we learned (~20 s)
 
-## Slide 11 · What a random forest is, and why it won (~2 minutes)
+Four lessons: the size of a move is predictable, the direction isn’t; sitting in cash has a cost; the past changes; and good predictions don’t automatically make good trades.
 
-A random forest is a crowd of simple decision trees — here, 300 of them.
+## 28. Questions (closing) · flash, one line (~10 s)
 
-Each tree is a flowchart of yes/no questions: is the market jumpy, is the price above its usual level, and so on. Each one learns from a different random slice of history, so they all disagree a little. For every day, all 300 trees vote, and the share of votes becomes a probability — for example 38% up, 35% flat, 27% down.
-
-Why did it win? Trees can learn combinations of signals, which the simpler logistic regression can’t. And voting protects against memorising. Gradient boosting shows the danger: it scored 0.74 on the data it trained on but only 0.32 on the practice exam — it memorised noise. The forest dropped much less, from 0.54 to 0.40, which tells us it learned something real, if small.
-
-## Slide 12 · Final exam: good at spotting calm weeks, not direction (~2 minutes)
-
-This grid shows every prediction on the final exam. Rows are what really happened; columns are what the model said.
-
-The big orange square in the middle: of 207 flat weeks, the model correctly called 129. That’s the one thing it’s genuinely good at.
-
-Now look at the corners, in blue. Of 92 real down weeks, it called 39 of them “up”. Of 198 real up weeks, it called 56 “down”. So when a big move comes, the model is close to a coin flip on which way it goes.
-
-Its overall score was 0.41, the same as on the practice exam and well above the simple baselines. So as a predictor it’s honest and better than guessing — but its skill is “calm week or big week”, not “up or down”. Keep that in mind.
-
-## Slide 13 · Turning predictions into trades (v1’s rule) (~1.5 minutes)
-
-Here’s how v1 turned the model’s votes into trades.
-
-If the model is more confident in “up” than in “down” by at least 5 percentage points, be in the market. If it’s more confident in “down”, move everything to cash. Otherwise, do nothing.
-
-There’s one extra rule: after buying, stay in for at least five days, to avoid paying fees for jumping in and out. And it’s always all of the money or none of it.
-
-Notice there was already a warning sign on the practice exam: this rule turned $100,000 into about $99,800, while Buy & Hold made about $104,800. It was the best of the rules we tried, but it never beat simply waiting, even before the final exam.
-
-## Slide 14 · Where the $32,832 went (~2 minutes)
-
-So where did the $32,800 go? Three places.
-
-First, one long pause. From December 2023 to April 2024 the model was in cash while the market rose about 14%. On roughly $106,000, that’s about $15,000 missed in one go.
-
-Second, too much time in cash overall: 42% of days. And here’s the key fact — on the days it sat out, the market rose just as much on average as on the days it was in. So stepping out never protected us from anything; it just meant missing gains.
-
-Third, trading costs: over $3,200, against $100 for Buy & Hold.
-
-But costs weren’t the main reason. Even with zero broker fees, the model would have finished around $127,500 — still about $29,000 behind.
-
-## Slide 15 · The real problem (statement) (~1.5 minutes)
-
-This is the real problem, and it’s the main thing we learned from reviewing version 1.
-
-The model is like a weather forecaster who can reliably tell you tomorrow will be windy, but not which direction the wind will blow. And we used that forecaster to choose which way to sail.
-
-Concretely: the model’s skill is recognising calm weeks. But the trading rule only compared “up” against “down” — exactly the part the model can’t do — and ignored the “calm week” prediction completely.
-
-So the good prediction score and the poor money result aren’t a contradiction. The rule disconnected them. That’s a design flaw, not just bad luck — and it’s fixable. That’s version 2.
-
-## Slide 16 · What version 2 changes (~2 minutes)
-
-Version 2 keeps everything that was done right — the measurements, the textbook/practice/final-exam split, the costs — and changes five things.
-
-One, and most important: use all three predictions. We combine the chances of an up, flat and down week into one expected gain, and only trade when that gain beats the roughly $300 cost of getting out and back in. Now the “calm week” skill counts.
-
-Two: we test two habits. Either stay invested and only step out on strong warnings, or stay in cash and only step in on strong signals. The practice exam decides which.
-
-Three: we measure the prediction from the next morning’s price, which is when the trade really happens.
-
-Four: we choose the model by money made on the practice exam, not just by prediction score.
-
-Five: instead of one two-year final exam, we also test year by year from 2013 to 2024.
-
-## Slide 17 · How we’ll know if it really works (~2 minutes)
-
-Beating or losing to Buy & Hold over one period doesn’t prove much either way. So version 2 adds four checks.
-
-The main one is on the left: 1,000 random traders. Each is in the market for the same number of days as our model, but on randomly chosen days. If our model can’t beat at least 950 of them, its timing is no better than luck. That’s a fair test, because it separates “was the model clever?” from “did it simply spend less time in the market?”.
-
-Two: cash earns interest. In 2023–24, cash earned about 5% a year; v1 assumed nothing.
-
-Three: error bars. We re-run the numbers on shuffled blocks of weeks to see how much they would change by chance.
-
-Four: a receipt for every trade, in dollars — exactly how much each exit gained or cost.
-
-## Slide 18 · Version 2 results: $100,000, 2023–2024 (~1.5 minutes)
-
-Here are the real version 2 results, all starting from $100,000 on the same final exam, 2023 to 2024.
-
-Buy & Hold: about $156,500. Version 1: about $123,700. Version 2: about $121,800 — slightly worse than version 1.
-
-The number on the right matters most. We ran 1,000 random traders who were in the market for the same number of days as version 2, just on random days. Version 2 beat only 264 of them. A typical random trader ended with about $128,400 — more than our model. To claim real timing skill, we said in advance it needed to beat at least 950.
-
-So version 2 fixed version 1’s design flaw, but the result shows there was very little “which way” skill underneath to use. And thanks to the random traders, we can say that with evidence, not just a hunch.
-
-## Slide 19 · Twelve years, one year at a time (~1.5 minutes)
-
-One two-year exam could be a fluke, so we also re-trained version 2 every January and let it trade each following year, from 2013 to 2024.
-
-Each bar is one year: how many percentage points version 2 was ahead of or behind Buy & Hold. Orange bars are years it won. There are only two: 2016, by a hair, and 2022, when the market fell and being in cash helped a lot.
-
-Over the whole twelve years, $100,000 would have grown to about $180,000 with version 2, against about $499,000 with Buy & Hold. Version 2 did have a smaller worst fall — about 22% against 34% — so it was calmer, but it gave up most of the growth.
-
-## Slide 20 · Why version 2 still lost (~2 minutes)
-
-Three reasons version 2 still lost.
-
-One: it stepped out of the market too often. Even the version whose default is to stay invested was only in the market about half the time.
-
-Two — and this is the most interesting finding — its down-week odds were inflated. Remember we told the model to pay extra attention to rare down weeks. That improves the prediction score, but it also makes the model overstate how likely a down week is. Version 2 uses those odds directly to compute an expected gain, and down weeks are also the biggest moves on average. So the expected gain kept dipping below zero and the model kept stepping out. A version 3 would need to correct, or “calibrate”, those odds first.
-
-Three: underneath, there just isn’t much direction skill. Most of its exits missed gains — for example, it was out for seven weeks from December 2023 while the market rose almost 7%.
-
-## Slide 21 · Class imbalance: good for predictions, bad for odds (~2 minutes)
-
-The brief asks every project to handle class imbalance, and every version of ours did. Here’s what that means and what it did.
-
-The top bar is the real mix of weeks in our training years: about 20% down weeks, 45% flat, 35% up. Left alone, a model learns that “down” is rarely the right answer and mostly stops predicting it.
-
-Balancing — with class weights, or with SMOTE, which creates extra synthetic down weeks — makes the model act as if all three kinds were equally common: the second bar. That’s what the brief wants, because the model now pays attention to down weeks. Version 1 tried both and no weighting at all; class weights scored best, so all versions kept them.
-
-But there’s a side effect: the model’s odds are now calibrated to that pretend world. It said down weeks had about a 30% chance on average, when the real figure was 21%. Version 1 never used the odds directly, so it didn’t matter. Version 2 did — so the inflated down-week odds kept pushing it out of the market.
-
-Version 3’s answer keeps both: handle the imbalance during training, exactly as the brief asks, then correct the odds before making any trading decision.
-
-## Slide 22 · Version 3: correct the odds first (~1.5 minutes)
-
-Version 3 tackles the problem we just found: the model’s odds of a down week were inflated. Before touching any trading, we wrote down a test for whether the odds were fixed, and checked it on ten years of history.
-
-The chart shows the average predicted chance of a down week. Version 2 said 30%. In reality it was 21%. Two simple fixes — training without the extra weight, or keeping it and mathematically undoing it — bring the average down to about 21 or 22%. On average, that’s fixed.
-
-But the share of down weeks swings a lot from year to year — 2017 had very few, 2022 had many — and a model trained on the past can’t see those swings coming. We had said in advance the odds must be within 3 points in at least 8 of 10 years. The best fix managed 4. So by our own rule, calibration failed, and we report that rather than quietly moving the bar.
-
-## Slide 23 · With honest odds, the best rule is: don’t trade (~1.5 minutes)
-
-Here are the six version 3 candidates, each re-trained every January from 2013 to 2022, starting with $100,000 and paying costs.
-
-We chose the winner with a rule we wrote down in advance: the best return for the risk taken. The winner was the “fitted correction, stay invested” version. And here’s the twist: in ten years it never once stepped out of the market. Its corrected odds never looked bad enough to justify paying the cost of selling. So it is simply Buy & Hold, and it ties Buy & Hold to the dollar.
-
-Every version that actually traded did worse. Even the ones that stayed invested 95% of the time ended about $70,000 behind, because their few exits were badly timed.
-
-So the honest conclusion of version 3 is: once the odds are corrected, the best our model can do is tell you not to trade. We’ve frozen that choice, and the last steps — checking it on 2025–26 data and a live paper-trade that started on 13 October — are still running.
-
-## Slide 24 · How we kept the test honest (~1.5 minutes)
-
-Since the assignment is graded on doing this properly, here is how we kept ourselves honest.
-
-One: for versions 2 and 3, we wrote the plan before writing any code — what we’d change, how we’d choose, and what would count as success. Each plan was committed to the repository with a digital fingerprint, so any later edit would be visible.
-
-Two: each version chose its model on earlier data, locked the choice, and only then looked at the test years.
-
-Three: 46 automated tests check that nothing can see the future — for example, scrambling all future prices or outcomes must leave every prediction unchanged.
-
-Four: whenever something went wrong, we logged it instead of hiding it. That includes a one-day overlap we found in one of version 1’s experiments, and version 3 failing its own calibration test.
-
-## Slide 25 · A flaw of machine learning, or of the question? (~1.5 minutes)
-
-A question we expect from you: is this a flaw of machine learning, or of the question we asked? Our answer: mostly the question.
-
-We asked a model to predict next week’s direction for SPY — one of the most heavily traded and closely watched funds in the world — using only its own price history. That history is public, so any simple pattern in it tends to be traded away by others. A better algorithm can’t find information that isn’t there.
-
-Our own limits played a part too: one fund, all in or all out, price data only, a one-week horizon. Lifting them would make the task easier, but not enough to flip the result — remember, even with zero fees, version 1 still lost.
-
-Machine learning does help in finance in other ways: ranking many stocks against each other, forecasting risk to decide how much to hold, and using data most people don’t have. Even there, the edges are usually small and shrink after trading costs.
-
-Which is why we judged every version against the fair bar: return for the risk taken, and beating random timing — not just “more money than Buy & Hold”.
-
-## Slide 26 · What we learned (~1.5 minutes)
-
-Four things we’d take away.
-
-One: how big next week’s move will be is somewhat predictable; which way it goes is not. Our model learned exactly that.
-
-Two: sitting in cash isn’t free. The market mostly rises, so every day out costs money unless you genuinely know something.
-
-Three: the past changes. A signal that worked for ten years actively misled the model in the 2022 downturn.
-
-Four: a good prediction score doesn’t automatically make good trades. Version 2 fixed the trading rule and still lost, partly because a setting that improves the prediction score — extra weight on rare down weeks — distorted the odds the rule depended on. And once version 3 corrected those odds, the best rule turned out to be: don’t trade.
-
-## Slide 27 · Questions (closing) (~30 seconds, then Q&A)
-
-To sum up: $100,000 left alone grew to about $156,500. Our first model grew it to about $123,700, because it could predict how big the next move would be but not which way, and its trading rule only used the direction.
-
-Version 2 fixed that rule and still ended with about $121,800. It beat only 264 of 1,000 random traders, and it trailed Buy & Hold in 10 of 12 years. Version 3 corrected the model’s odds, and its best rule was simply never to sell. So the honest conclusion is that this model has no real timing skill — and the project shows how to prove that properly.
-
-Everything is in the repository on screen. Thanks — we’re happy to take questions.
+Everything is in the repository on screen. Thank you, and we’re happy to take questions.
