@@ -183,7 +183,7 @@ text(s, "Class mix, training data 2010–2020", { x: 7.4, y: 1.5, w: 5.3, h: 0.3
   s.addShape(pres.shapes.RECTANGLE, { x: 8.2, y: y + 0.05, w: 4.0 * v / 0.45, h: 0.35, fill: { color: col }, line: { color: col } });
   text(s, pct(v, 0), { x: 8.3 + 4.0 * v / 0.45, y, w: 0.8, h: 0.45, fontSize: 14, valign: "middle" });
 });
-card(s, 7.4, 4.0, 5.33, 2.3, "Class imbalance", "Sell weeks are the minority. Class weights were used (SMOTE and no weighting were tested and scored lower). This improves recall of the minority class but inflates its predicted probability — see slide 14.", { bodySize: 13 });
+card(s, 7.4, 4.0, 5.33, 2.3, "Class imbalance", "Sell weeks are the minority. Class weights were used (SMOTE and no weighting were tested and scored lower). This improves recall of the minority class but inflates its predicted probability — see slide 15.", { bodySize: 13 });
 note(s, "All features are strictly lagged; tests confirm that changing future prices never changes a past feature.", 4.75);
 
 // ---------- 5. validation design ----------
@@ -207,6 +207,27 @@ vd.forEach(([t, b], i) => {
   const x = M + (i % 2) * 6.15, y = 3.0 + Math.floor(i / 2) * 1.75;
   card(s, x, y, 5.98, 1.6, t, b, { bodySize: 14 });
 });
+
+// ---------- 5b. integrity: data use and models ----------
+s = content("How we kept the results honest", S2);
+s.addTable([
+  [hdr("Data"), hdr("Period"), hdr("Size"), hdr("Used for"), hdr("Used to choose anything?")],
+  ["Training", "2010 – 2020", "2,764 days", "Fitting and tuning (5-fold time-series cross-validation)", "Yes — model settings"],
+  ["Validation", "2021 – 2022", "498 days", "Choosing the model and the trading rule", "Yes — then frozen"],
+  ["Test", "2023 – 2024", "497 days", "Scored once, after freezing", "No"],
+  ["Walk-forward", "2013 – 2024", "12 yearly refits", "Robustness across market conditions", "No — reporting only"],
+  ["Holdout", "Jan 2025 – Oct 2026", "439 days", "Later out-of-sample check (v3)", "No"],
+  ["Paper-trade", "From 13 Oct 2026", "Live", "The only fully blind test", "No"],
+], Object.assign({ x: M, y: 1.4, w: CW, colW: [1.6, 2.1, 1.7, 4.2, 2.53], fontSize: 12, rowH: 0.38, margin: [0.03, 0.08, 0.03, 0.08] }, TABLE));
+s.addTable([
+  [hdr("Model"), hdr("Key settings"), hdr("Tuning")],
+  ["Random forest (v1)", "300 trees · at least 68 days per leaf · balanced class weights", "20 random settings · 5-fold time-series CV · macro-F1"],
+  ["Logistic regression (v2, v3)", `Standardised inputs · C = ${W2.frozen_config.params.clf__C.toFixed(3)} · balanced weights · v3 adds calibration`, "20 random settings · 5-fold time-series CV · log loss"],
+], Object.assign({ x: M, y: 4.25, w: CW, colW: [2.7, 5.2, 4.23], fontSize: 12, rowH: 0.42, margin: [0.03, 0.08, 0.03, 0.08] }, TABLE));
+text(s, [
+  { text: "Safeguards: ", options: { bold: true, color: C.text1 } },
+  { text: "periods never overlap (5–6 day buffer at each boundary, also inside cross-validation); all scaling and resampling fit on training folds only; selection rules written down before results; 51 automated tests check features, labels, splits and every refit for use of future data." },
+], { x: M, y: 5.65, w: CW, h: 0.85, fontSize: 13 });
 
 // ---------- 6. three iterations ----------
 s = content("Three iterations", S2);
