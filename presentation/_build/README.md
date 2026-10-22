@@ -6,6 +6,7 @@
 
 - `outputs/scorecard.json` and `outputs/scorecard_paths.json` (from `notebooks/scorecard.ipynb`)
 - `outputs/weekly/v1/`, `v2/`, `v3/results.json` (from `notebooks/weekly_v1.ipynb` … `weekly_v3.ipynb`)
+- `outputs/v4/results.json` and `outputs/v4/paths.json` (from `notebooks/v4_drawdown_aware.ipynb`)
 - `outputs/eda_slides.json` (from `presentation/_build/eda_data.py`: price, autocorrelations, class mix by year, feature correlations; same data and definitions as `notebooks/01_eda.ipynb`)
 
 ## Commands

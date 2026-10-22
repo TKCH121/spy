@@ -4,11 +4,13 @@ Module 3 Group 7 · 2026-10-22. Detailed reports: [weekly strategies](weekly/rep
 
 ## Question and answer
 
+*In the presentation, the **baseline** is v1w and the **final model** is v4; v2 and v3 are the intermediate steps between them.*
+
 **Question.** A classifier predicts the best action for SPY over the next 5 trading days: Buy (return > +1%), Sell (< −1%) or Hold. Does trading on it beat buying and holding?
 
 **Strategy.** After each week's last close, take the model's prediction, trade at the next open, and hold for the week. Buy → invested, Sell → in cash earning T-bills, Hold → no change.
 
-**Answer: no.** Three successive versions, each tested without look-ahead and with realistic costs, were beaten by Buy & Hold on return and on risk-adjusted return. The classifier has a small, genuine skill, but it is in the **size** of next week's move, not its **direction**.
+**Answer: no.** Three successive versions that tried to time the market's direction, each tested without look-ahead and with realistic costs, were beaten by Buy & Hold on return and on risk-adjusted return. A fourth version, aimed at avoiding large losses, stayed close to the market. It cut drawdowns only by giving up a similar share of return. The classifier has a small, genuine skill, but it is in the **size** of next week's move, not its **direction**.
 
 ### Scorecard ([notebook](../notebooks/scorecard.ipynb))
 
@@ -43,6 +45,24 @@ $100,000; 0.10% fee + 0.05% slippage per side; cash earns the 13-week T-bill rat
 | **v1** (Peter Li) | Random forest; Buy/Sell rule from the two directional probabilities | The brief's baseline design | $126,864. The model's skill (recognising flat weeks) never reached the trading rule. |
 | **v2** | Expected-return rule using all three probabilities, trading only when the gain beats the 0.30% round-trip cost. Model and rule chosen together by validation Sharpe. Cash earns T-bills. Execution-aligned label. | Fix v1's design flaw; judge by money, not prediction score | $110,453. Validation chose "stay in cash unless confident", which almost never invested afterwards. |
 | **v3** | Correct the probabilities (class weighting inflates the odds of a down week) before using them | v2's expected gain was biased downwards | $156,546. With honest odds, the expected gain never justified selling, so it never trades. |
+
+## v4: asking the investor's question ([report](v4/report.md))
+
+v1–v3 asked which way SPY would move. v4 asks: **can the model keep most of the market's return while cutting its worst losses?**
+- **Label:** Sell = the next 5 days lose more than 2%, Buy = gain more than 1%, otherwise Hold.
+- **Decision:** each week, go to cash if the calibrated chance of a large loss is high; otherwise stay invested.
+- **Target, set before any results:** at least 85% of buy-and-hold's return, with the smallest drawdown.
+
+| Development 2013–2022 | Annual return | Max drawdown |
+|---|---|---|
+| Buy & Hold | 12.2% | −33.7% |
+| Lowest-drawdown candidate (random forest, τ 0.20) | 8.9% (72% of the market) | **−21.5%** |
+| Selected (gradient boosting, τ 0.40; best candidate keeping ≥ 85% of return) | 12.0% (98%) | −33.7% |
+
+- **Less drawdown costs return.** Cutting the worst fall by about a third cost about 28% of the return. No candidate reached your target on both counts.
+- **The selected model is almost always invested.** It matched buy-and-hold on 2023–24 and over 2013–24 ($488,154 vs $499,271). On the 2025–26 holdout it finished **$139,986 vs $134,410**, by stepping out for the week after the April 2025 sell-off.
+- **That was a single decision.** Its only exit in 2013–24 (April 2020) cost money, so it is not evidence of skill.
+- **Both exits came right after a crash:** the model reacts to volatility, not direction, as the EDA predicted.
 
 ## What we learned
 

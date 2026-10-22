@@ -2,19 +2,23 @@
 
 A machine-learning classifier predicts the best action for SPY (the S&P 500 ETF) over the next 5 trading days: **Buy** (return > +1%), **Sell** (< −1%) or **Hold**. The trading strategy acts on it **once a week**: after the week's last close it takes the prediction, trades at the next open, and holds for the week. Results are compared with buying and holding, on return and on risk. The project is graded on methodology, code quality and interpretation, so everything is built to be leakage-free and tested honestly.
 
-## The answer in three lines
+## The answer in four lines
 
 1. **Buy & Hold won, on return and on risk-adjusted return.** On 2023–24 (cash earning T-bills), $100,000 became **$156,546** by buying and holding (Sharpe 1.43, max drawdown −10.0%). v1w made **$126,864** (0.76, −9.7%). v2w made **$110,453**: it stayed in cash. v3w **never sold**, so it equals Buy & Hold.
 2. **The model predicts the size of next week's move, not its direction.** It beats guessing as a classifier (macro-F1 about 0.40 vs 0.32), but has no usable timing skill.
-3. **Why:** next week's direction for the world's most-watched fund, from its own public prices, carries almost no signal, and every week out of a rising market costs money. Full write-up: **[outputs/SUMMARY.md](outputs/SUMMARY.md)**.
+3. **Changing the question helps, within limits.** v4 aims to keep most of the market's return with smaller losses. It stayed close to buy-and-hold (2025–26 holdout: $139,986 vs $134,410, from one well-timed exit). In development, cutting the worst fall by a third cost about 28% of the return. [v4 report](outputs/v4/report.md)
+4. **Why:** next week's direction for the world's most-watched fund, from its own public prices, carries almost no signal, and every week out of a rising market costs money. Full write-up: **[outputs/SUMMARY.md](outputs/SUMMARY.md)**.
 
 ## Versions
+
+The presentation compares two of these: the **baseline** (v1w, the brief's direction question) and the **final model** (v4, avoid large losses while keeping most of the market's return). v2w and v3w are intermediate steps that led to the final design.
 
 | | Model | Key change | Test accuracy / macro-F1 | $100,000 on 2023–24 | Max drawdown | Sharpe |
 |---|---|---|---|---|---|---|
 | **v1w** (v1 by Peter Li) | Random forest | The brief's baseline design, deciding weekly | 44.9% / 0.408 | $126,864 | −9.7% | 0.76 |
 | **v2w** | Logistic regression | Expected-return rule over all three probabilities; model and rule chosen together by money; cash earns T-bills | 45.4% / 0.404 | $110,453 (all cash) | 0.0% | — |
 | **v3w** | Calibrated logistic regression | Corrects the odds that class weighting inflates | 48.2% / 0.339 | $156,546 (never sells) | −10.0% | 1.43 |
+| **v4** | Gradient boosting | Asks the investor's question: Sell = a large loss (< −2%) ahead; stay invested otherwise; aim for ≥ 85% of the market's return with less drawdown | 56.5% / 0.338 | $156,546 (no exit) | −10.0% | 1.43 |
 | Buy & Hold | — | — | — | **$156,546** | −10.0% | **1.43** |
 
 All rows are on one basis: costs included, cash earning the T-bill rate, and Sharpe over T-bills. The [scorecard](notebooks/scorecard.ipynb) adds volatility, Calmar, the 12-year walk-forward, the 2025–26 holdout, and the original **daily-decision** versions for comparison (v1 $129,069, v2 $121,812, v3 $156,546). v1–v3 were first built with daily decisions; [docs/weekly_rebuild_note.md](docs/weekly_rebuild_note.md) is the plan, written before the rebuild ran, for rebuilding each one weekly.
@@ -37,7 +41,7 @@ All rows are on one basis: costs included, cash earning the T-bill rate, and Sha
 - **Timing:** the decision is made after the week's last close and filled at the next open. Models learn from every trading day's 5-day outcome.
 - **Splits:** Train 2010–2020 / Validation 2021–2022 / Test 2023–2024, never shuffled. Rows whose label window would cross a boundary are dropped: 5 rows for the close→close label, 6 for the open→open label. Tuning uses `TimeSeriesSplit` with the same gap.
 - **Preprocessing:** all scaling and resampling sit inside sklearn/imblearn Pipelines and are fit on each training fold only.
-- **Decisions written down before results:** v1 plan in [docs/](docs/); [v2 design note](docs/v2_design_note.md); [v3 design note](docs/v3_design_note.md) and [weekly rebuild plan](docs/weekly_rebuild_note.md), both with SHA-256. Each test was opened once per design, and later changes are logged as dated deviations.
+- **Decisions written down before results:** v1 plan in [docs/](docs/); [v2 design note](docs/v2_design_note.md); [v3 design note](docs/v3_design_note.md) and [weekly rebuild plan](docs/weekly_rebuild_note.md), both with SHA-256; [v4 design note](docs/v4_design_note.md). Each test was opened once per design, and later changes are logged as dated deviations.
 - **Evidence beyond one number:** risk metrics, a 1,000-path random-timing benchmark with matched exposure, block-bootstrap intervals, a 12-year walk-forward with yearly refits, and cash earning T-bill interest.
 
 ## Repository layout
@@ -45,7 +49,7 @@ All rows are on one basis: costs included, cash earning the T-bill rate, and Sha
 ```text
 README.md                 this page
 outputs/SUMMARY.md        lessons learned and the scorecard
-docs/                     v1 plan (EN / 中文), v2 and v3 design notes, weekly rebuild plan
+docs/                     v1 plan (EN / 中文), v2, v3 and v4 design notes, weekly rebuild plan
 notebooks/
   01_eda.ipynb                        v1 · exploratory analysis
   02_modeling.ipynb                   v1 · pipeline, baselines, tuning, selection, one-time test
@@ -59,6 +63,7 @@ notebooks/
   weekly_decisions.ipynb              the frozen daily models run on a weekly schedule
   weekly_v1.ipynb … weekly_v3.ipynb   v1w, v2w, v3w · rebuilt with weekly decisions
   scorecard.ipynb                     every strategy · return and risk on one basis
+  v4_drawdown_aware.ipynb             v4 · near-market return with a smaller drawdown
 src/
   config.py      design constants (dates, thresholds, costs, gaps)
   data.py        download / load the price snapshot
@@ -74,7 +79,7 @@ src/
   v3.py          probability calibration treatments and their walk-forward
   weekly.py      the weekly decision schedule
 tests/           51 tests: look-ahead, labels, splits, strategies, calibration, weekly schedule
-outputs/         v1 results · research/ · v2/ · v3/ · weekly/ (incl. v1–v3 rebuilds) · scorecard.json
+outputs/         v1 results · research/ · v2/ · v3/ · weekly/ (incl. v1–v3 rebuilds) · v4/ · scorecard.json
 data/            raw/ price and T-bill snapshots · holdout/ 2025–26 data
 presentation/    slide deck, speaking notes, build files
 knowledge&docs/  course materials and project brief (read-only)
@@ -101,7 +106,7 @@ conda run -n spy-m3 python -m pytest -q
 ```
 
 ```bash
-cd notebooks && for n in 01_eda 02_modeling 03_backtest 04_strategy_research 05_holdout_2025 v2_02_modeling v3_01_calibration v3_02_development_and_freeze v3_03_test_and_holdout weekly_decisions weekly_v1 weekly_v2 weekly_v3 scorecard; do conda run -n spy-m3 jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.kernel_name=spy-m3 $n.ipynb; done
+cd notebooks && for n in 01_eda 02_modeling 03_backtest 04_strategy_research 05_holdout_2025 v2_02_modeling v3_01_calibration v3_02_development_and_freeze v3_03_test_and_holdout weekly_decisions weekly_v1 weekly_v2 weekly_v3 scorecard v4_drawdown_aware; do conda run -n spy-m3 jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.kernel_name=spy-m3 $n.ipynb; done
 ```
 
 Code style is checked with `ruff check src tests` and `ruff format --check src tests` (config in `ruff.toml`). On some Windows setups, pytest needs `--basetemp` pointing to a writable folder.

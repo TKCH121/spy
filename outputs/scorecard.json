@@ -253,5 +253,20 @@
     "costs": 99.9,
     "time_invested": 1.0,
     "beats_random": null
+  },
+  {
+    "period": "2025\u201326 holdout",
+    "strategy": "v1w",
+    "schedule": "weekly",
+    "final_value": 129743.4,
+    "cagr": 0.1589,
+    "ann_vol": 0.1478,
+    "max_drawdown": -0.1205,
+    "sharpe": 0.809,
+    "calmar": 1.32,
+    "round_trips": 13,
+    "costs": 2839.5,
+    "time_invested": 0.742,
+    "beats_random": 0.747
   }
 ]
