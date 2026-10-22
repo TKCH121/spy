@@ -1,38 +1,58 @@
-# One decision a week — the brief's literal reading
+# Weekly strategies — v1, v2 and v3 rebuilt to decide once a week
 
-Module 3 Group 7 · 2026-10-22 · notebook `notebooks/weekly_decisions.ipynb` · code `src/weekly.py` · full risk metrics in `notebooks/scorecard.ipynb`
+Module 3 Group 7 · 2026-10-22 · plan [docs/weekly_rebuild_note.md](../../docs/weekly_rebuild_note.md) (SHA-256 `82602bdd…`, committed before any rebuild ran) · notebooks `weekly_v1`, `weekly_v2`, `weekly_v3`, `scorecard`
 
-## Why
+## The strategy
 
-The brief asks for a model that predicts *the optimal action (Buy, Sell or Hold) over the next 5 trading days*. Every version makes that 5-day prediction **every trading day** and acts on it daily, so neighbouring windows overlap (v1 only blocks exits within 5 days of buying). The literal reading is **one decision a week**:
+The brief asks for a model that predicts *the optimal action (Buy, Sell or Hold) over the next 5 trading days*. Each weekly strategy does exactly that:
 
-> After Friday's close (or the last trading day of the week), predict Buy, Hold or Sell for the next 5 trading days. Trade at Monday's open. Hold all week: **Buy** → invested, **Sell** → cash, **Hold** → keep last week's position.
+> **After the close on the last trading day of the week** (normally Friday), the model predicts Buy, Hold or Sell for the next 5 trading days. The trade fills at the next open (normally Monday), and the position is held for the week. **Buy** → invested in SPY, **Sell** → in cash (earning the T-bill rate), **Hold** → keep last week's position.
 
-## How (and the disclosure)
+**Training is unchanged:** models learn from every trading day's 5-day outcome, with the same labels, gaps, features, tuning and costs as v1–v3. Each version kept its own selection rule and re-made only the choices that depend on the schedule, on its own validation or development data.
 
-- **Same frozen models, labels and costs.** Only the decision schedule changes. v1 and v2 use their saved test predictions; v3 and the walk-forward recompute the same frozen yearly fits.
-- **Cash earns the T-bill rate for every version.** v1 as built let cash earn 0%; interest on cash is one of our improvements. The notebook first reproduces v1's published $123,714 at 0%, then scores it with T-bills.
-- **Each daily run reproduces the published figure:** v2 $121,812, and the v2 walk-forward $179,977.
-- **Decided after all test results were known.** This is a sensitivity check on data we have already seen, not a new selection.
+## What each version selected
 
-## Results ($100,000, after costs, cash earns T-bills)
+| Version | Model | Re-selected on a weekly schedule | Pick | Validation / development result (Sharpe) |
+|---|---|---|---|---|
+| **v1w** | Random forest (v1's E06, unchanged) | Signal rule (probability margin) on the 2021–22 weekly backtest | **argmax** (act on the most likely class) | 0.58 vs Buy & Hold 0.22 |
+| **v2w** | LR, RF or HGB (v2's tuning) × default long / cash | Model and default on the 2021–22 weekly backtest | **Logistic regression, default cash** | 0.21 vs 0.17 |
+| **v3w** | v2w's logistic regression × 3 calibration treatments × 2 defaults | Treatment and default on the 2013–22 weekly walk-forward | **Sigmoid calibration, default long** (never sells) | 0.71 vs 0.71 |
 
-| Version · period | Decides daily | Decides weekly | Buy & Hold | Round trips (daily → weekly) | Costs (daily → weekly) | Max drawdown (daily → weekly) | Beats random timing (daily → weekly) |
-|---|---|---|---|---|---|---|---|
-| v1 · 2021–22 validation | $100,432 | $94,293 | $104,773 | 13 → 9 | $2,730 → $1,735 | −17.0% → −21.5% | 54% → 31% |
-| **v1 · 2023–24 test** | $129,069 | **$129,705** | $156,546 | 15 → 6 | $3,317 → $1,256 | −9.4% → −8.7% | 46% → 39% |
-| **v2 · 2023–24 test** | $121,812 | **$123,834** | $156,546 | 17 → 9 | $3,754 → $1,988 | −10.0% → −9.9% | 26% → 18% |
-| v2 · 2013–24 walk-forward | $179,977 | $167,581 | $499,271 | 112 → 48 | $27,257 → $11,579 | −22.4% → −30.6% | 32% → 6% |
-| v3 · 2023–24 test | $156,546 | $156,546 | $156,546 | 1 → 1 | — | −10.0% | not applicable |
-| v3 · 2025–26 holdout | $134,410 | $134,410 | $134,410 | 1 → 1 | — | −18.8% | not applicable |
+The calibration check for v3w's new base model failed the pre-set rule again: the average P(Sell) was corrected, but year-to-year drift was not (4 of 10 years within ±3 points; 8 needed).
 
-Buy & Hold's maximum drawdown was −24.5% (2021–22), −10.0% (2023–24), −33.7% (2013–24) and −18.8% (2025–26). The random-timing benchmark uses 1,000 paths with the same time in the market and the same number of switches (200 paths for the 12-year walk-forward).
+## Results (cash earns T-bills; after costs)
+
+**Test 2023–2024**
+
+| Strategy | $100,000 became | Annual return | Volatility | Max drawdown | Sharpe | Round trips | Costs | Time invested | Beats random timing |
+|---|---|---|---|---|---|---|---|---|---|
+| **Buy & Hold** | **$156,546** | **25.2%** | 12.8% | −10.0% | **1.43** | 1 | $100 | 100% | — |
+| v1w | $126,864 | 12.7% | 9.8% | −9.7% | 0.76 | 11 | $2,554 | 60% | 27% |
+| v2w | $110,453 | 5.1% | 0.0% | 0.0% | — (all cash) | 0 | $0 | 0% | not applicable |
+| v3w | $156,546 | 25.2% | 12.8% | −10.0% | 1.43 | 1 | $100 | 100% | not applicable |
+
+v1w as built (cash at 0%) made $121,900.
+
+**Walk-forward 2013–2024 and holdout 2025-01 → 2026-10**
+
+| Strategy | $100,000 became | Annual return | Max drawdown | Sharpe | Time invested |
+|---|---|---|---|---|---|
+| Buy & Hold, 2013–24 | **$499,271** | **14.4%** | −33.7% | **0.80** | 100% |
+| v2w, 2013–24 | $140,013 | 2.9% | **−4.7%** | 0.46 | 2% |
+| v3w, 2013–24 | $499,271 | 14.4% | −33.7% | 0.80 | 100% |
+| Buy & Hold = v3w, 2025–26 holdout | $134,410 | 18.2% | −18.8% | 0.84 | 100% |
 
 ## What it shows
 
-1. **Weekly decisions halve the trading and the costs,** as expected: fewer, longer positions.
-2. **They don't change the conclusion.** On 2023–24, weekly v1 and v2 gain about $600–2,000 over daily, but stay about $27,000–33,000 behind Buy & Hold.
-3. **Timing and risk control get slightly worse, not better.** Against random traders with the same exposure, weekly ranks lower in every period. Over 12 years, weekly v2's worst fall was −30.6%, against −22.4% when deciding daily. Reacting once a week is slower, and there was no direction skill to protect.
-4. **v3 is unaffected:** its corrected odds never fall below the exit line, so it never trades on either schedule.
+1. **No weekly strategy beat Buy & Hold** on return, Sharpe or Calmar in any period. v3w matched it only because it never sold.
+2. **Choosing on two years of validation is fragile.** v1w and v2w both looked better than Buy & Hold on 2021–22, which included the 2022 fall, and both trailed badly on 2023–24's rally. v2w's pick, "stay in cash unless the model is confident", hardly ever invested afterwards.
+3. **Lower risk came only from being out of the market.** v2w's worst fall over 12 years was −4.7%, but it was invested 2% of the time. Its few trades were well timed (it beat all 200 random paths with the same exposure), yet it earned 2.9% a year against 14.4%. v1w's volatility was lower than Buy & Hold's, but its worst fall was the same.
+4. **Weekly vs daily makes little difference** to the conclusion. The original daily versions made $129,069 (v1), $121,812 (v2) and $156,546 (v3) on the same basis. Deciding weekly roughly halves trading costs, but the model's weakness is in what it predicts (direction), not in how often it acts.
 
-**Bottom line:** the model's weakness is in what it predicts (direction), not in how often it acts. Matching the brief's 5-day horizon exactly makes the design cleaner and cheaper, but not more profitable or safer.
+## Disclosure
+
+The rebuild was decided after all daily results, including 2023–24 and the 2025–26 holdout, were known. Selection used only training and validation (or development) data, so these test results are honest but **not blind**. The only blind evidence is the paper-trade window from 2026-10-13.
+
+## Earlier: the weekly schedule applied to the frozen daily models
+
+Before the rebuild, `notebooks/weekly_decisions.ipynb` applied the weekly schedule to the frozen daily models without re-selecting anything. With T-bill cash, on 2023–24: v1 $129,705, v2 $123,834, v3 = Buy & Hold. Detailed figures are in `outputs/weekly/results.json` and `details.json`.
