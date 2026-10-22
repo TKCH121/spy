@@ -1,10 +1,10 @@
 # Presentation script — Can a computer beat “buy and wait”?
 
-Module 3 Group 7 · goes with `SPY_Model_Presentation.pptx` (26 slides) · about 40 minutes plus questions.
+Module 3 Group 7 · goes with `SPY_Model_Presentation.pptx` (27 slides) · about 42 minutes plus questions.
 
 Read it in your own words rather than word for word. Replace anything in [square brackets] before presenting.
 
-**Short on time?** Skipping slides 3 (glossary), 7 (the 15 measurements), 11 (random forest explained), 13 (trading rule), 17 (how we judge v2), 19 (twelve years) and 22 (v3 development detail) brings it to about 27 minutes. The story still holds: question → v1 result → why it lost → v2 → v3 → honesty → lessons. For about 20 minutes, also skip 6, 8 and 20 and cover their points in one sentence each.
+**Short on time?** Skipping slides 3 (glossary), 7 (the 15 measurements), 11 (random forest explained), 13 (trading rule), 17 (how we judge v2), 19 (twelve years) and 23 (v3 development detail) brings it to about 29 minutes. The story still holds: question → v1 result → why it lost → v2 → v3 → honesty → lessons. For about 20 minutes, also skip 6, 8 and 20 and cover their points in one sentence each.
 
 ## Slide 1 · Cover (~1 minute)
 
@@ -216,7 +216,19 @@ Two — and this is the most interesting finding — its down-week odds were inf
 
 Three: underneath, there just isn’t much direction skill. Most of its exits missed gains — for example, it was out for seven weeks from December 2023 while the market rose almost 7%.
 
-## Slide 21 · Version 3: correct the odds first (~1.5 minutes)
+## Slide 21 · Class imbalance: good for predictions, bad for odds (~2 minutes)
+
+The brief asks every project to handle class imbalance, and every version of ours did. Here’s what that means and what it did.
+
+The top bar is the real mix of weeks in our training years: about 20% down weeks, 45% flat, 35% up. Left alone, a model learns that “down” is rarely the right answer and mostly stops predicting it.
+
+Balancing — with class weights, or with SMOTE, which creates extra synthetic down weeks — makes the model act as if all three kinds were equally common: the second bar. That’s what the brief wants, because the model now pays attention to down weeks. Version 1 tried both and no weighting at all; class weights scored best, so all versions kept them.
+
+But there’s a side effect: the model’s odds are now calibrated to that pretend world. It said down weeks had about a 30% chance on average, when the real figure was 21%. Version 1 never used the odds directly, so it didn’t matter. Version 2 did — so the inflated down-week odds kept pushing it out of the market.
+
+Version 3’s answer keeps both: handle the imbalance during training, exactly as the brief asks, then correct the odds before making any trading decision.
+
+## Slide 22 · Version 3: correct the odds first (~1.5 minutes)
 
 Version 3 tackles the problem we just found: the model’s odds of a down week were inflated. Before touching any trading, we wrote down a test for whether the odds were fixed, and checked it on ten years of history.
 
@@ -224,7 +236,7 @@ The chart shows the average predicted chance of a down week. Version 2 said 30%.
 
 But the share of down weeks swings a lot from year to year — 2017 had very few, 2022 had many — and a model trained on the past can’t see those swings coming. We had said in advance the odds must be within 3 points in at least 8 of 10 years. The best fix managed 4. So by our own rule, calibration failed, and we report that rather than quietly moving the bar.
 
-## Slide 22 · With honest odds, the best rule is: don’t trade (~1.5 minutes)
+## Slide 23 · With honest odds, the best rule is: don’t trade (~1.5 minutes)
 
 Here are the six version 3 candidates, each re-trained every January from 2013 to 2022, starting with $100,000 and paying costs.
 
@@ -234,7 +246,7 @@ Every version that actually traded did worse. Even the ones that stayed invested
 
 So the honest conclusion of version 3 is: once the odds are corrected, the best our model can do is tell you not to trade. We’ve frozen that choice, and the last steps — checking it on 2025–26 data and a live paper-trade that started on 13 October — are still running.
 
-## Slide 23 · How we kept the test honest (~1.5 minutes)
+## Slide 24 · How we kept the test honest (~1.5 minutes)
 
 Since the assignment is graded on doing this properly, here is how we kept ourselves honest.
 
@@ -246,7 +258,7 @@ Three: 46 automated tests check that nothing can see the future — for example,
 
 Four: whenever something went wrong, we logged it instead of hiding it. That includes a one-day overlap we found in one of version 1’s experiments, and version 3 failing its own calibration test.
 
-## Slide 24 · A flaw of machine learning, or of the question? (~1.5 minutes)
+## Slide 25 · A flaw of machine learning, or of the question? (~1.5 minutes)
 
 A question we expect from you: is this a flaw of machine learning, or of the question we asked? Our answer: mostly the question.
 
@@ -258,7 +270,7 @@ Machine learning does help in finance in other ways: ranking many stocks against
 
 Which is why we judged every version against the fair bar: return for the risk taken, and beating random timing — not just “more money than Buy & Hold”.
 
-## Slide 25 · What we learned (~1.5 minutes)
+## Slide 26 · What we learned (~1.5 minutes)
 
 Four things we’d take away.
 
@@ -270,7 +282,7 @@ Three: the past changes. A signal that worked for ten years actively misled the 
 
 Four: a good prediction score doesn’t automatically make good trades. Version 2 fixed the trading rule and still lost, partly because a setting that improves the prediction score — extra weight on rare down weeks — distorted the odds the rule depended on. And once version 3 corrected those odds, the best rule turned out to be: don’t trade.
 
-## Slide 26 · Questions (closing) (~30 seconds, then Q&A)
+## Slide 27 · Questions (closing) (~30 seconds, then Q&A)
 
 To sum up: $100,000 left alone grew to about $156,500. Our first model grew it to about $123,700, because it could predict how big the next move would be but not which way, and its trading rule only used the direction.
 

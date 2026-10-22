@@ -577,6 +577,48 @@ Three: underneath, there just isn’t much direction skill. Most of its exits mi
 
 [~2 minutes]`);
 
+// ---------- 18d. class imbalance ----------
+s = content("Class imbalance: good for predictions, bad for odds", S4);
+const mixRows = [
+  ["Real mix of weeks, 2010–2020", [["Down 20%", 0.202, C.accent2], ["Flat 45%", 0.448, C.accent3], ["Up 35%", 0.35, C.accent1]]],
+  ["What the model is trained to treat as normal, after balancing", [["Down 33%", 1 / 3, C.accent2], ["Flat 33%", 1 / 3, C.accent3], ["Up 33%", 1 / 3, C.accent1]]],
+];
+const barW = 8.3;
+mixRows.forEach(([lab, segs], r) => {
+  const y = 1.45 + r * 1.2;
+  text(s, lab, { x: M, y, w: barW, h: 0.38, fontSize: 15, bold: true, color: C.text1 });
+  let bx = M;
+  segs.forEach(([t, share, col]) => {
+    const w = barW * share;
+    s.addShape(pres.shapes.RECTANGLE, { x: bx, y: y + 0.42, w: w - 0.04, h: 0.6, fill: { color: col }, line: { color: col } });
+    text(s, t, { x: bx, y: y + 0.42, w: w - 0.04, h: 0.6, fontSize: 15, bold: true, color: C.background1, align: "center", valign: "middle" });
+    bx += w;
+  });
+});
+card(s, 9.2, 1.45, 3.53, 2.25, "Good for predictions, bad for odds", "The model stops ignoring rare down weeks, but its odds of one come out inflated: 30% predicted vs 21% real.", { bodySize: 14, titleSize: 17, fill: "FBEDE4" });
+const steps4 = [
+  ["The brief", "Requires handling imbalance: SMOTE, class weights or thresholds."],
+  ["Version 1", "Class weights. SMOTE and no weighting were tested; weights scored best."],
+  ["Version 2", "Used the odds directly, so the inflated down-week odds kept it selling."],
+  ["Version 3", "Keep the weights for training, then correct the odds before trading."],
+];
+const sw = (CW - 3 * 0.2) / 4;
+steps4.forEach(([t, b], i) => {
+  const x = M + i * (sw + 0.2);
+  card(s, x, 4.0, sw, 2.45, t, b, { badge: String(i + 1), bodySize: 14, titleSize: 17 });
+});
+note(s, `The brief asks every project to handle class imbalance, and every version of ours did. Here’s what that means and what it did.
+
+The top bar is the real mix of weeks in our training years: about 20% down weeks, 45% flat, 35% up. Left alone, a model learns that “down” is rarely the right answer and mostly stops predicting it.
+
+Balancing — with class weights, or with SMOTE, which creates extra synthetic down weeks — makes the model act as if all three kinds were equally common: the second bar. That’s what the brief wants, because the model now pays attention to down weeks. Version 1 tried both and no weighting at all; class weights scored best, so all versions kept them.
+
+But there’s a side effect: the model’s odds are now calibrated to that pretend world. It said down weeks had about a 30% chance on average, when the real figure was 21%. Version 1 never used the odds directly, so it didn’t matter. Version 2 did — so the inflated down-week odds kept pushing it out of the market.
+
+Version 3’s answer keeps both: handle the imbalance during training, exactly as the brief asks, then correct the odds before making any trading decision.
+
+[~2 minutes]`);
+
 // ---------- v3a. calibration ----------
 pres.addSection({ title: S4b });
 s = content("Version 3: correct the odds first", S4b);
@@ -721,7 +763,7 @@ const md = [
   "",
   "Read it in your own words rather than word for word. Replace anything in [square brackets] before presenting.",
   "",
-  "**Short on time?** Skipping slides 3 (glossary), 7 (the 15 measurements), 11 (random forest explained), 13 (trading rule), 17 (how we judge v2), 19 (twelve years) and 22 (v3 development detail) brings it to about 27 minutes. The story still holds: question → v1 result → why it lost → v2 → v3 → honesty → lessons. For about 20 minutes, also skip 6, 8 and 20 and cover their points in one sentence each.",
+  "**Short on time?** Skipping slides 3 (glossary), 7 (the 15 measurements), 11 (random forest explained), 13 (trading rule), 17 (how we judge v2), 19 (twelve years) and 23 (v3 development detail) brings it to about 29 minutes. The story still holds: question → v1 result → why it lost → v2 → v3 → honesty → lessons. For about 20 minutes, also skip 6, 8 and 20 and cover their points in one sentence each.",
   "",
   ...SCRIPT.flatMap((x) => [`## Slide ${x.n} · ${x.title}${x.time ? ` (~${x.time})` : ""}`, "", x.text, ""]),
 ].join("\n");
